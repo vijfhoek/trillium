@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Assigns",""],["Handlebars",""]],"trait":[["HandlebarsConnExt",""]]});

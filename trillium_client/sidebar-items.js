@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","Concrete errors that occur within trillium's http implementation"],["NativeTls",""],["Rustls",""]],"struct":[["Client",""],["Conn",""],["NativeTlsConfig",""],["Pool",""],["RustlsConfig",""],["TcpConfig",""],["TcpStream","A TCP connection."]],"trait":[["ClientTransport",""]],"type":[["Result","this crate's result type"]]});

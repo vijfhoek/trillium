@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","Possible WebSocket errors"],["Message","An enum representing the various forms of a WebSocket message."]],"struct":[["WebSocket",""],["WebSocketConnection",""]],"type":[["Result",""]]});

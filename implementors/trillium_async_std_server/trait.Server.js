@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["trillium_async_std_server"] = [{"text":"impl <a class=\"trait\" href=\"trillium_async_std_server/trait.Server.html\" title=\"trait trillium_async_std_server::Server\">Server</a> for <a class=\"struct\" href=\"trillium_async_std_server/struct.AsyncStdServer.html\" title=\"struct trillium_async_std_server::AsyncStdServer\">AsyncStdServer</a>","synthetic":false,"types":["trillium_async_std_server::AsyncStdServer"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

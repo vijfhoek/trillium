@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["async_trait",""]],"macro":[["conn_ok",""],["conn_try",""],["log_error",""],["sequence",""]],"struct":[["BoxedTransport",""],["Conn",""],["Sequence",""],["State",""]],"trait":[["Handler",""],["Transport",""]],"type":[["Upgrade",""]]});

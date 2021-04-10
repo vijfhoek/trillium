@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["CompileError",""],["Error","askama error type"]],"fn":[["get_template_source",""],["read_config_file",""]],"mod":[["filters","Module for built-in filter functions"],["helpers",""]],"struct":[["Config",""],["Integrations",""],["MarkupDisplay",""],["Syntax",""]],"type":[["Result",""]]});

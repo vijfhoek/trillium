@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Context","The struct that holds the context of a template rendering."],["Tera","The main point of interaction in this library."],["TeraHandler",""]],"trait":[["TeraConnExt",""]]});

@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `async_compat` crate."><meta name="keywords" content="rust, rustlang, rust-lang, async_compat"><title>async_compat - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../async_compat/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate async_compat</p><div class="block version"><p>Version 0.2.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all async_compat's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="async_compat" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">async_compat</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/async_compat/lib.rs.html#1-442" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Compatibility adapter between tokio and futures.</p>
+<p>There are two kinds of compatibility issues between <a href="https://docs.rs/tokio">tokio</a> and <a href="https://docs.rs/futures">futures</a>:</p>
+<ol>
+<li>Tokio's types cannot be used outside tokio context, so any attempt to use
+them will panic.
+<ul>
+<li>Solution: If you apply the <a href="../async_compat/struct.Compat.html" title="Compat"><code>Compat</code></a> adapter to a future, the future will enter the
+context of a global single-threaded tokio runtime started by this crate. That does
+<em>not</em> mean the future runs on the tokio runtime - it only means the future sets a
+thread-local variable pointing to the global tokio runtime so that tokio's types can be
+used inside it.</li>
+</ul>
+</li>
+<li>Tokio and futures have similar but different I/O traits <code>AsyncRead</code>, <code>AsyncWrite</code>,
+<code>AsyncBufRead</code>, and <code>AsyncSeek</code>.
+<ul>
+<li>Solution: When the <a href="../async_compat/struct.Compat.html" title="Compat"><code>Compat</code></a> adapter is applied to an I/O type, it will implement traits
+of the opposite kind. That's how you can use tokio-based types wherever futures-based
+types are expected, and the other way around.</li>
+</ul>
+</li>
+</ol>
+<p>You can apply the <a href="../async_compat/struct.Compat.html" title="Compat"><code>Compat</code></a> adapter using the <a href="../async_compat/struct.Compat.html#method.new" title="Compat::new()"><code>Compat::new()</code></a> constructor or using any
+method from the <a href="../async_compat/trait.CompatExt.html" title="CompatExt"><code>CompatExt</code></a> trait.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<p>This program reads lines from stdin and echoes them into stdout, except it's not going to work:</p>
+
+<div class='information'><div class='tooltip compile_fail'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered compile_fail">
+<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="kw">async</span> {
+        <span class="kw">let</span> <span class="ident">stdin</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">stdin</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">stdout</span>();
+
+        <span class="comment">// The following line will not work for two reasons:</span>
+        <span class="comment">// 1. Runtime error because stdin and stdout are used outside tokio context.</span>
+        <span class="comment">// 2. Compilation error due to mismatched `AsyncRead` and `AsyncWrite` traits.</span>
+        <span class="ident">futures</span>::<span class="ident">io</span>::<span class="ident">copy</span>(<span class="ident">stdin</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stdout</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    })
+}</pre></div>
+<p>To get around the compatibility issues, apply the <a href="../async_compat/struct.Compat.html" title="Compat"><code>Compat</code></a> adapter to <code>stdin</code>, <code>stdout</code>, and
+<a href="https://docs.rs/futures/0.3/futures/io/fn.copy.html"><code>futures::io::copy()</code></a>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">async_compat</span>::<span class="ident">CompatExt</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="kw">async</span> {
+        <span class="kw">let</span> <span class="ident">stdin</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">stdin</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">stdout</span>();
+
+        <span class="ident">futures</span>::<span class="ident">io</span>::<span class="ident">copy</span>(<span class="ident">stdin</span>.<span class="ident">compat</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stdout</span>.<span class="ident">compat_mut</span>()).<span class="ident">compat</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    })
+}</pre></div>
+<p>It is also possible to apply <a href="../async_compat/struct.Compat.html" title="Compat"><code>Compat</code></a> to the outer future passed to
+<a href="https://docs.rs/futures/0.3/futures/executor/fn.block_on.html"><code>futures::executor::block_on()</code></a> rather than <a href="https://docs.rs/futures/0.3/futures/io/fn.copy.html"><code>futures::io::copy()</code></a> itself.
+When applied to the outer future, individual inner futures don't need the adapter because
+they're all now inside tokio context:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">async_compat</span>::{<span class="ident">Compat</span>, <span class="ident">CompatExt</span>};
+
+<span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">Compat</span>::<span class="ident">new</span>(<span class="kw">async</span> {
+        <span class="kw">let</span> <span class="ident">stdin</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">stdin</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">stdout</span>();
+
+        <span class="ident">futures</span>::<span class="ident">io</span>::<span class="ident">copy</span>(<span class="ident">stdin</span>.<span class="ident">compat</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stdout</span>.<span class="ident">compat_mut</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }))
+}</pre></div>
+<p>The compatibility adapter converts between tokio-based and futures-based I/O types in any
+direction. Here's how we can write the same program by using futures-based I/O types inside
+tokio:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">async_compat</span>::<span class="ident">CompatExt</span>;
+<span class="kw">use</span> <span class="ident">blocking</span>::<span class="ident">Unblock</span>;
+
+<span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stdin</span> <span class="op">=</span> <span class="ident">Unblock</span>::<span class="ident">new</span>(<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">stdin</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">Unblock</span>::<span class="ident">new</span>(<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">stdout</span>());
+
+    <span class="ident">tokio</span>::<span class="ident">io</span>::<span class="ident">copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stdin</span>.<span class="ident">compat_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stdout</span>.<span class="ident">compat_mut</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(())
+}</pre></div>
+<p>Finally, we can use any tokio-based crate from any other async runtime.
+Here are <a href="https://docs.rs/reqwest">reqwest</a> and <a href="https://docs.rs/warp">warp</a> as an example:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">async_compat</span>::{<span class="ident">Compat</span>, <span class="ident">CompatExt</span>};
+<span class="kw">use</span> <span class="ident">warp</span>::<span class="ident">Filter</span>;
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">Compat</span>::<span class="ident">new</span>(<span class="kw">async</span> {
+        <span class="comment">// Make an HTTP GET request.</span>
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">reqwest</span>::<span class="ident">get</span>(<span class="string">&quot;https://www.rust-lang.org&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">response</span>.<span class="ident">text</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+
+        <span class="comment">// Start an HTTP server.</span>
+        <span class="kw">let</span> <span class="ident">routes</span> <span class="op">=</span> <span class="ident">warp</span>::<span class="ident">any</span>().<span class="ident">map</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;Hello from warp!&quot;</span>);
+        <span class="ident">warp</span>::<span class="ident">serve</span>(<span class="ident">routes</span>).<span class="ident">run</span>(([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>], <span class="number">8080</span>)).<span class="kw">await</span>;
+    }))
+}</pre></div>
+</div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Compat.html" title="async_compat::Compat struct">Compat</a></td><td class="docblock-short"><p>Compatibility adapter for futures and I/O types.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.CompatExt.html" title="async_compat::CompatExt trait">CompatExt</a></td><td class="docblock-short"><p>Applies the <a href="../async_compat/struct.Compat.html" title="Compat"><code>Compat</code></a> adapter to futures and I/O types.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="async_compat"></div>
+    <script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
