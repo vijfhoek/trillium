@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["full_duplex_copy",""]],"struct":[["BufReader","Adds buffering to a reader."]]});

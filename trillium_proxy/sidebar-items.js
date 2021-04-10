@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["NativeTls",""],["Rustls",""]],"struct":[["NativeTlsConfig",""],["Proxy",""],["RustlsConfig",""],["TcpConfig",""],["TcpStream","A TCP connection."]],"trait":[["ClientTransport",""]]});

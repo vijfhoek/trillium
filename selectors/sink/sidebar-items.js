@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["Push","A trait to abstract over a `push` method that may be implemented for different kind of types."]]});

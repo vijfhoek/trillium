@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["stopper"] = [{"text":"impl&lt;S&gt; PinnedDrop for <a class=\"struct\" href=\"stopper/struct.StreamStopper.html\" title=\"struct stopper::StreamStopper\">StreamStopper</a>&lt;S&gt;","synthetic":false,"types":["stopper::stream_stopper::StreamStopper"]},{"text":"impl&lt;F&gt; PinnedDrop for <a class=\"struct\" href=\"stopper/struct.FutureStopper.html\" title=\"struct stopper::FutureStopper\">FutureStopper</a>&lt;F&gt;","synthetic":false,"types":["stopper::future_stopper::FutureStopper"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

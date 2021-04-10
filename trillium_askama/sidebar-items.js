@@ -1,1 +1,0 @@
-initSidebarItems({"derive":[["Template",""]],"trait":[["AskamaConnExt",""],["Template","Main `Template` trait; implementations are generally derived"]]});

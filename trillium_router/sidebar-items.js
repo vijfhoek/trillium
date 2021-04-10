@@ -1,1 +1,0 @@
-initSidebarItems({"macro":[["routes",""]],"struct":[["Router",""],["RouterRef",""]],"trait":[["RouterConnExt",""]]});

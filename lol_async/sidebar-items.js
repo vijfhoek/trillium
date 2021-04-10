@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["lol",""]],"struct":[["Lol",""],["LolReader",""]]});

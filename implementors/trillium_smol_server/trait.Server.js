@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["trillium_smol_server"] = [{"text":"impl <a class=\"trait\" href=\"trillium_smol_server/trait.Server.html\" title=\"trait trillium_smol_server::Server\">Server</a> for <a class=\"struct\" href=\"trillium_smol_server/struct.SmolServer.html\" title=\"struct trillium_smol_server::SmolServer\">SmolServer</a>","synthetic":false,"types":["trillium_smol_server::SmolServer"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

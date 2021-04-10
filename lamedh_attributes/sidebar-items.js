@@ -1,1 +1,0 @@
-initSidebarItems({"attr":[["lambda","Wrap an async function into the lambda constructs"]]});

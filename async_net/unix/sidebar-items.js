@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Incoming","A stream of incoming Unix connections."],["UnixDatagram","A Unix datagram socket."],["UnixListener","A Unix server, listening for connections."],["UnixStream","A Unix connection."]]});

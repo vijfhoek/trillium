@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["FutureStopper",""],["Stopper","This struct provides a synchronized mechanism for canceling Futures and Streams."],["StreamStopper",""]]});
