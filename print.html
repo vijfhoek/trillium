@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li><li class="chapter-item expanded "><a href="naming.html"><strong aria-hidden="true">1.3.</strong> Naming</a></li></ol></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li></ol></li><li class="chapter-item expanded "><a href="handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li class="chapter-item expanded "><a href="example.html"><strong aria-hidden="true">4.</strong> Building an example app</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">5.</strong> Contributing</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li></ol></li><li class="chapter-item expanded "><a href="handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="handlers/logger.html"><strong aria-hidden="true">3.1.</strong> Logger</a></li><li class="chapter-item expanded "><a href="handlers/cookies.html"><strong aria-hidden="true">3.2.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="handlers/sessions.html"><strong aria-hidden="true">3.3.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="handlers/templates.html"><strong aria-hidden="true">3.4.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="handlers/proxy.html"><strong aria-hidden="true">3.5.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="handlers/static.html"><strong aria-hidden="true">3.6.</strong> Static File Serving</a></li><li class="chapter-item expanded "><a href="handlers/websockets.html"><strong aria-hidden="true">3.7.</strong> Websockets</a></li><li class="chapter-item expanded "><a href="handlers/router.html"><strong aria-hidden="true">3.8.</strong> Router</a></li></ol></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">4.</strong> Contributing</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,8 +166,8 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="welcome"><a class="header" href="#welcome">Welcome</a></h1>
-<p>Hi! Welcome to the documentation for trillium, an async rust web server
-toolkit. This section needs a little more content</p>
+<p>Hi! Welcome to the documentation for trillium, a modular toolkit for
+building async rust web applications.</p>
 <h2 id="who-is-this-document-for"><a class="header" href="#who-is-this-document-for">Who is this document for?</a></h2>
 <p>This document expects some familiarity with async rust. We intend to
 offer a beginner level document at some point, but for now we
@@ -181,18 +181,19 @@ concepts and patterns in http servers and frameworks.</p>
 <a href="https://hexdocs.pm/plug/readme.html">plug</a>, as they serve as the
 primary inspirations for trillium.</p>
 <h1 id="who-is-behind-this"><a class="header" href="#who-is-behind-this">Who is behind this?</a></h1>
-<p>Hi, I'm <a href="https://github.com/jbr">jbr</a>. I'm currently the sole author
-of trillium, but hopefully that will change over time. I've been working
-on tide, async-h1, and http-types for the last year, and have landed a
-number of exciting features in that framework, such as sessions, unix
-socket listeners, tls, and websockets. I've also done a bunch of work
-in tide's http implementation, async-h1. Trillium is the direct product of
-that experience. I am continuing to contribute to http-rs, but as
+<p>👋 I'm <a href="https://github.com/jbr">jbr</a>. I've been working on tide,
+async-h1, and http-types for the last year, and have landed a number
+of exciting features in that framework, such as sessions, unix socket
+listeners, tls, and websockets. I've also done a bunch of work in
+tide's http implementation, async-h1. Trillium is the direct product
+of that experience. I am continuing to contribute to http-rs, but as
 tide's design stabilizes, I am branching out in order to explore a
 number of alternative designs that I have been considering for the
 majority of the last year.</p>
-<p>As such, some of the documentation will describe differences from
-tide.</p>
+<p>As such, some of the documentation will reference tide from tide. I
+also have substantial experience with node/express, koa, phoenix,
+sinatra, and rails, and will try to incorporate references to those
+frameworks to provide touchstones.</p>
 <h1 id="about-this-document"><a class="header" href="#about-this-document">About this document</a></h1>
 <p>Here are some conventions in this document.</p>
 <ul>
@@ -223,14 +224,12 @@ tide.</p>
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
 <p>Footnotes can always be skipped</p>
 </div>
-<h1 id="naming"><a class="header" href="#naming">Naming</a></h1>
-<p>I'll update this section when I actually know what this is called</p>
 <h1 id="architectural-overview"><a class="header" href="#architectural-overview">Architectural Overview</a></h1>
 <h2 id="composability"><a class="header" href="#composability">Composability</a></h2>
 <p>Trillium is published as a set of components that can be easily composed
 to create web servers. One of the goals of this design is that to the
 extent possible, all components be replaceable by alternatives.</p>
-<h2 id="why-is-replacability-so-important"><a class="header" href="#why-is-replacability-so-important">Why is replacability so important?</a></h2>
+<h2 id="why-is-substitutability-so-important"><a class="header" href="#why-is-substitutability-so-important">Why is substitutability so important?</a></h2>
 <p>It is the author's opinion that async rust web frameworks still have a
 lot of exciting exploration left in the near future. Instead of
 offering one solution as the best, trillium offers a playground in which
@@ -244,14 +243,16 @@ someone to add support for each of those features.</p>
 only be one or two options, I think it is an essential aspect of good
 software design that frameworks be modular and composable, as there
 will always be tradeoffs for any given design.</p>
-<h2 id="only-compile-what-you-need-without-having-to-toggle-cargo-features"><a class="header" href="#only-compile-what-you-need-without-having-to-toggle-cargo-features">Only compile what you need, without having to toggle cargo features</a></h2>
+<h2 id="only-pay-for-what-you-need-without-having-to-toggle-cargo-features"><a class="header" href="#only-pay-for-what-you-need-without-having-to-toggle-cargo-features">Only pay for what you need, without having to toggle cargo features</a></h2>
 <p>Instead of declaring a large list of top level dependencies and
-conditionally including/excluding them based on cargo features, trillium
-has a &quot;only compile what you need&quot; approach to dependencies.  In
-particular, we avoid pulling in runtimes like tokio or async-std
-except in the crates where you explicitly need those, preferring
-instead to depend on small crates like <code>futures_lite</code> wherever
-possible.</p>
+conditionally including/excluding them based on cargo features,
+trillium tries to apply rust's &quot;only pay for what you need&quot; approach
+both at runtime and compile time.  In particular, we avoid pulling in
+runtimes like tokio or async-std except in the crates where you
+explicitly need those, preferring instead to depend on small crates
+like <code>futures_lite</code> wherever possible. Additionally, and in contrast
+to tide, there is zero default behavior. If you don't need a router,
+you don't need to compile or run a router.</p>
 <p>Everything is opt-in, instead of opt-out. We use small crates, each of
 which declares its own dependencies.</p>
 <h3 id="relation-to-tide-http-types-and-async-h1"><a class="header" href="#relation-to-tide-http-types-and-async-h1">Relation to tide, http-types, and async-h1</a></h3>
@@ -469,60 +470,29 @@ explore the design space and accommodate different design constraints
 and tradeoffs. Because not every application will need this
 functionality, they are each released as distinct libraries from the
 core of trillium.</p>
-<h2 id="routers"><a class="header" href="#routers">Routers</a></h2>
-<p>The trillium router is based on
-<a href="https://github.com/jbr/routefinder">routefinder</a>. This router
-supports two types of patterns: Untyped params and a single
-wildcard. Named params are captured in a map-like interface. Any
-handler can be mounted inside of a Router (including other Routers),
-allowing entire applications to be mounted on a path, and allowing for
-sequences to be run on a given route. Any handler mounted inside of a
-route that includes a <code>*</code> will have the url rewritten to the contents
-of that star.</p>
-<p>Alternative routers that are not based on routefinder are a prime
-opportunity for innovation and exploration.</p>
-<p>Here's a simple example of an application that responds to a request
-like http://localhost:8000/greet/earth with &quot;hello earth&quot; and
-http://localhost:8000/greet/mars with &quot;hello mars&quot; and responds to
-http://localhost:8000 with &quot;hello everyone&quot;</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
-use trillium_router::{Router, RouterConnExt};
+<ul>
+<li><a href="./handlers/logger.html">Logger</a></li>
+<li><a href="./handlers/cookies.html">Cookies</a></li>
+<li><a href="./handlers/sessions.html">Sessions</a></li>
+<li><a href="./handlers/templates.html">Template Engines</a></li>
+<li><a href="./handlers/proxy.html">Proxy</a></li>
+<li><a href="./handlers/static.html">Static File Serving</a></li>
+<li><a href="./handlers/websockets.html">Websockets</a></li>
+<li><a href="./handlers/router.html">Router</a></li>
+</ul>
+<h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
+<p>Currently there's just a DevLogger, but soon there will be more
+loggers. Trillium loggers use the <code>log</code> crate and emit one line at the
+info log level per http request/response pair. We like to use the
+<code>env_logger</code> crate, but any <code>log</code> backend will work equally well.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::sequence;
+use trillium_logger::DevLogger;
 
 pub fn main() {
     env_logger::init();
-    trillium_smol_server::run(
-        Router::new()
-            .get(&quot;/&quot;, |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) })
-            .get(&quot;/hello/:planet&quot;, |conn: Conn| async move {
-                let planet = conn.param(&quot;planet&quot;).unwrap();
-                let response_body = format!(&quot;hello {}&quot;, planet);
-                conn.ok(response_body)
-            }),
-    );
+    trillium_smol_server::run(sequence![DevLogger, &quot;ok&quot;]);
 }
 </code></pre></pre>
-<h3 id="experimental-macro"><a class="header" href="#experimental-macro">Experimental macro</a></h3>
-<p>Because routers are very common, there's also a macro. Currently, the
-above example with a macro looks like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
-use trillium_router::{routes, RouterConnExt};
-
-pub fn main() {
-    env_logger::init();
-    trillium_smol_server::run(routes![
-        get &quot;/&quot; |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) },
-
-        get &quot;/hello/:planet&quot; |conn: Conn| async move {
-            let planet = conn.param(&quot;planet&quot;).unwrap();
-            let response_body = format!(&quot;hello {}&quot;, planet);
-            conn.ok(response_body)
-        }
-    ]);
-}
-</code></pre></pre>
-<blockquote>
-<p>🚧 Feedback and improvements on the syntax are very welcome.</p>
-</blockquote>
 <h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
 use trillium_cookies::{Cookie, Cookies, CookiesConnExt};
@@ -587,57 +557,6 @@ pub fn main() {
     ]);
 }
 </code></pre></pre>
-<h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
-<p>Currently there's just a DevLogger, but soon there will be more
-loggers. Trillium loggers use the <code>log</code> crate and emit one line at the
-info log level per http request/response pair. We like to use the
-<code>env_logger</code> crate, but any <code>log</code> backend will work equally well.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::sequence;
-use trillium_logger::DevLogger;
-
-pub fn main() {
-    env_logger::init();
-    trillium_smol_server::run(sequence![DevLogger, &quot;ok&quot;]);
-}
-</code></pre></pre>
-<h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
-<p>WebSockets work a lot like tide's, since I recently wrote that
-interface as well. One difference in trillium is that the websocket
-connection also contains some aspects of the original http request,
-such as request headers, the request path and method, and any state
-that has been accumulated by previous handlers in a sequence.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use futures_util::StreamExt;
-use trillium_websockets::{Message, WebSocket};
-
-pub fn main() {
-    env_logger::init();
-
-    trillium_smol_server::run(WebSocket::new(|mut websocket| async move {
-        while let Some(Ok(Message::Text(input))) = websocket.next().await {
-            websocket
-                .send_string(format!(&quot;received your message: {}&quot;, &amp;input))
-                .await;
-        }
-    }));
-}
-</code></pre></pre>
-<h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
-<p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
-<h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
-<p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::Static;
-
-pub fn main() {
-    trillium_smol_server::run(Static::new(&quot;../docs/book/&quot;).with_index_file(&quot;index.html&quot;))
-}
-</code></pre></pre>
-<h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
-<p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiled};
-pub fn main() {
-    trillium_smol_server::run(StaticCompiled::new(include_dir!(&quot;./src&quot;)).with_index_file(&quot;lib.rs&quot;));
-}
-</code></pre></pre>
 <h2 id="template-engines"><a class="header" href="#template-engines">Template engines</a></h2>
 <p>There are currently three template engines for trillium. Although they are in no way mutually exclusive, most applications will want at most one of these.</p>
 <h3 id="askama"><a class="header" href="#askama">Askama</a></h3>
@@ -696,8 +615,94 @@ fn main() {
     ]);
 }
 </code></pre></pre>
-<h1 id="building-an-example-app"><a class="header" href="#building-an-example-app">Building an example app</a></h1>
-<p>In this section, we build a real-world application up from scratch</p>
+<h1 id="proxy"><a class="header" href="#proxy">Proxy</a></h1>
+<p>Trillium includes a custom http client implementation in order to
+support reverse proxying requests. There are two tls implementations
+for this client.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use async_net::TcpStream;
+use trillium::sequence;
+use trillium_client::Rustls;
+use trillium_logger::DevLogger;
+use trillium_proxy::Proxy;
+
+pub fn main() {
+    env_logger::init();
+    trillium_smol_server::run(sequence![
+        DevLogger,
+        Proxy::&lt;Rustls&lt;TcpStream&gt;&gt;::new(&quot;https://httpbin.org/&quot;)
+    ]);
+}
+</code></pre></pre>
+<h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
+<p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
+<h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
+<p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::Static;
+
+pub fn main() {
+    trillium_smol_server::run(Static::new(&quot;../docs/book/&quot;).with_index_file(&quot;index.html&quot;))
+}
+</code></pre></pre>
+<h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
+<p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiled};
+pub fn main() {
+    trillium_smol_server::run(StaticCompiled::new(include_dir!(&quot;./src&quot;)).with_index_file(&quot;lib.rs&quot;));
+}
+</code></pre></pre>
+<h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
+<p>WebSockets work a lot like tide's, since I recently wrote that
+interface as well. One difference in trillium is that the websocket
+connection also contains some aspects of the original http request,
+such as request headers, the request path and method, and any state
+that has been accumulated by previous handlers in a sequence.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use futures_util::StreamExt;
+use trillium_websockets::{Message, WebSocket};
+
+pub fn main() {
+    env_logger::init();
+
+    trillium_smol_server::run(WebSocket::new(|mut websocket| async move {
+        while let Some(Ok(Message::Text(input))) = websocket.next().await {
+            websocket
+                .send_string(format!(&quot;received your message: {}&quot;, &amp;input))
+                .await;
+        }
+    }));
+}
+</code></pre></pre>
+<h2 id="router"><a class="header" href="#router">Router</a></h2>
+<p>The trillium router is based on
+<a href="https://github.com/jbr/routefinder">routefinder</a>. This router
+supports two types of patterns: Untyped params and a single
+wildcard. Named params are captured in a map-like interface. Any
+handler can be mounted inside of a Router (including other Routers),
+allowing entire applications to be mounted on a path, and allowing for
+sequences to be run on a given route. Any handler mounted inside of a
+route that includes a <code>*</code> will have the url rewritten to the contents
+of that star.</p>
+<p>Alternative routers that are not based on routefinder are a prime
+opportunity for innovation and exploration.</p>
+<p>Here's a simple example of an application that responds to a request
+like http://localhost:8000/greet/earth with &quot;hello earth&quot; and
+http://localhost:8000/greet/mars with &quot;hello mars&quot; and responds to
+http://localhost:8000 with &quot;hello everyone&quot;</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+use trillium_router::{Router, RouterConnExt};
+
+pub fn main() {
+    env_logger::init();
+    trillium_smol_server::run(
+        Router::new()
+            .get(&quot;/&quot;, |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) })
+            .get(&quot;/hello/:planet&quot;, |conn: Conn| async move {
+                let planet = conn.param(&quot;planet&quot;).unwrap();
+                let response_body = format!(&quot;hello {}&quot;, planet);
+                conn.ok(response_body)
+            }),
+    );
+}
+</code></pre></pre>
 <h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
 <p>If you're excited about the ideas here, this page will be kept up to date with ways to get involved.</p>
 <ol>
