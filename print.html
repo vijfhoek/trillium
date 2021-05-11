@@ -138,13 +138,15 @@
                         </a>
                         
                         
+                        
+
                     </div>
                 </div>
 
                 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -180,7 +182,7 @@ concepts and patterns in http servers and frameworks.</p>
 <a href="https://www.phoenixframework.org/">phoenix</a> /
 <a href="https://hexdocs.pm/plug/readme.html">plug</a>, as they serve as the
 primary inspirations for trillium.</p>
-<h1 id="who-is-behind-this"><a class="header" href="#who-is-behind-this">Who is behind this?</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="who-is-behind-this"><a class="header" href="#who-is-behind-this">Who is behind this?</a></h1>
 <p>👋 I'm <a href="https://github.com/jbr">jbr</a>. I've been working on tide,
 async-h1, and http-types for the last year, and have landed a number
 of exciting features in that framework, such as sessions, unix socket
@@ -194,7 +196,7 @@ majority of the last year.</p>
 also have substantial experience with node/express, koa, phoenix,
 sinatra, and rails, and will try to incorporate references to those
 frameworks to provide touchstones.</p>
-<h1 id="about-this-document"><a class="header" href="#about-this-document">About this document</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="about-this-document"><a class="header" href="#about-this-document">About this document</a></h1>
 <p>Here are some conventions in this document.</p>
 <ul>
 <li><code>use</code> declarations will only be listed once on the first usage of a given type in order to keep code samples concise</li>
@@ -224,7 +226,7 @@ frameworks to provide touchstones.</p>
 <div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
 <p>Footnotes can always be skipped</p>
 </div>
-<h1 id="architectural-overview"><a class="header" href="#architectural-overview">Architectural Overview</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="architectural-overview"><a class="header" href="#architectural-overview">Architectural Overview</a></h1>
 <h2 id="composability"><a class="header" href="#composability">Composability</a></h2>
 <p>Trillium is published as a set of components that can be easily composed
 to create web servers. One of the goals of this design is that to the
@@ -270,7 +272,7 @@ components that are trillium, but I don't expect that to happen for a
 while. I hope to keep the core feature set of trillium quite small and
 focus on getting the design right and improving performance as much as
 possible. </p>
-<h1 id="two-core-concepts-conn-and-handlers"><a class="header" href="#two-core-concepts-conn-and-handlers">Two core concepts: Conn and Handlers</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="two-core-concepts-conn-and-handlers"><a class="header" href="#two-core-concepts-conn-and-handlers">Two core concepts: Conn and Handlers</a></h1>
 <p>The two most important concepts in trillium are the <code>Conn</code> type and the
 <code>Handler</code> trait. Each <code>Conn</code> represents a single http request/response
 pair.</p>
@@ -462,7 +464,7 @@ run(trillium::sequence![
 <p>Sequence is itself a handler, and as a result can be used in any place
 another handler could be used.  If you need to, you can nest sequences
 inside of each other.</p>
-<h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
 <p>In order for trillium to be a usable web framework, we offer a number of
 core utilities. However, it is our hope that alternative
 implementations for at least some of these will exist in order to
@@ -480,7 +482,7 @@ core of trillium.</p>
 <li><a href="./handlers/websockets.html">Websockets</a></li>
 <li><a href="./handlers/router.html">Router</a></li>
 </ul>
-<h2 id="router"><a class="header" href="#router">Router</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="router"><a class="header" href="#router">Router</a></h2>
 <p>The trillium router is based on
 <a href="https://github.com/jbr/routefinder">routefinder</a>. This router
 supports two types of patterns: Untyped params and a single
@@ -512,7 +514,7 @@ pub fn main() {
     );
 }
 </code></pre></pre>
-<h2 id="template-engines"><a class="header" href="#template-engines">Template engines</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="template-engines"><a class="header" href="#template-engines">Template engines</a></h2>
 <p>There are currently three template engines for trillium. Although they are in no way mutually exclusive, most applications will want at most one of these.</p>
 <h3 id="askama"><a class="header" href="#askama">Askama</a></h3>
 <p>Askama is a jinja-based template engine that preprocesses templates at
@@ -570,7 +572,7 @@ fn main() {
     ]);
 }
 </code></pre></pre>
-<h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
 <p>Currently there's just a DevLogger, but soon there will be more
 loggers. Trillium loggers use the <code>log</code> crate and emit one line at the
 info log level per http request/response pair. We like to use the
@@ -583,7 +585,7 @@ pub fn main() {
     trillium_smol_server::run(sequence![DevLogger, &quot;ok&quot;]);
 }
 </code></pre></pre>
-<h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
 use trillium_cookies::{Cookie, Cookies, CookiesConnExt};
 
@@ -603,7 +605,7 @@ pub fn main() {
     }]);
 }
 </code></pre></pre>
-<h2 id="sessions"><a class="header" href="#sessions">Sessions</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="sessions"><a class="header" href="#sessions">Sessions</a></h2>
 <p>Sessions are a common convention in web frameworks, allowing for a
 safe and secure way to associate server-side data with a given http
 client (browser). Trillium's session storage is built on the
@@ -647,7 +649,7 @@ pub fn main() {
     ]);
 }
 </code></pre></pre>
-<h1 id="proxy"><a class="header" href="#proxy">Proxy</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="proxy"><a class="header" href="#proxy">Proxy</a></h1>
 <p>Trillium includes a custom http client implementation in order to
 support reverse proxying requests. There are two tls implementations
 for this client.</p>
@@ -665,7 +667,7 @@ pub fn main() {
     ]);
 }
 </code></pre></pre>
-<h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
 <p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
 <h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
 <p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
@@ -682,7 +684,7 @@ pub fn main() {
     trillium_smol_server::run(StaticCompiled::new(include_dir!(&quot;./src&quot;)).with_index_file(&quot;lib.rs&quot;));
 }
 </code></pre></pre>
-<h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
 <p>WebSockets work a lot like tide's, since I recently wrote that
 interface as well. One difference in trillium is that the websocket
 connection also contains some aspects of the original http request,
@@ -703,7 +705,7 @@ pub fn main() {
     }));
 }
 </code></pre></pre>
-<h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
 <p>If you're excited about the ideas here, this page will be kept up to date with ways to get involved.</p>
 <ol>
 <li>Build stuff <em>using</em> trillium. Open source if possible, but even if not, feedback from actual deployed applications will be given higher priority than issues that aren't driven by real use cases.</li>
