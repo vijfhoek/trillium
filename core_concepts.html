@@ -221,9 +221,9 @@ supports a chainable (fluent) interface for setting properties, like:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>conn.status(202)
-    .send_header(&quot;content-type&quot;, &quot;application/something-custom&quot;)
-    .body(&quot;this is my custom body&quot;)
+</span>conn.with_status(202)
+    .with_header((&quot;content-type&quot;, &quot;application/something-custom&quot;))
+    .with_body(&quot;this is my custom body&quot;)
 <span class="boring">}
 </span></code></pre></pre>
 <h3 id="accessing-http-request-properties"><a class="header" href="#accessing-http-request-properties">Accessing http request properties</a></h3>

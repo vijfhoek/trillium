@@ -183,7 +183,7 @@
 </li>
 <li>Comparisons with Tide
 <blockquote>
-<p>🌊 Tide endpoints look like <code>|_req: Request&lt;_&gt;| async { Response::new(200) }</code> whereas Trillium handlers look like <code>|conn: Conn| async move { conn.status(200) }</code></p>
+<p>🌊 Tide endpoints look like <code>|_req: Request&lt;_&gt;| async { Response::new(200) }</code> whereas Trillium handlers look like <code>|conn: Conn| async move { conn.with_status(200) }</code></p>
 </blockquote>
 </li>
 <li>Comparisons with Plug:
