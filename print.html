@@ -422,11 +422,11 @@ pub fn main() {
         .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
 }
 </code></pre></pre>
-<h2 id="sequences"><a class="header" href="#sequences">Sequences</a></h2>
+<h2 id="sequences-and-tuples"><a class="header" href="#sequences-and-tuples">Sequences and Tuples</a></h2>
 <p>Earlier, we discussed that we can use state to send data between
 handlers and that handlers can always pass along the conn
 unchanged. In order to use this, we need to introduce the notion of
-Sequences. A sequence is a <code>Vec</code> of handlers, each of which is run on
+Sequences. A Sequence is a <code>Vec</code> of handlers, each of which is run on
 the connection until one of the handlers halts the conn.</p>
 <blockquote>
 <p>🔌 Readers familiar with elixir plug will recognize this notion as
@@ -464,6 +464,19 @@ run(trillium::sequence![
 <p>Sequence is itself a handler, and as a result can be used in any place
 another handler could be used.  If you need to, you can nest sequences
 inside of each other.</p>
+<h3 id="tuples-too"><a class="header" href="#tuples-too">Tuples, too!</a></h3>
+<p>For sequences of up to 15 handlers that are known at compile-time,
+tuples can and should be used. This avoids heap-allocating handlers.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>env_logger::init();
+run((
+    trillium_logger::DevLogger,
+    |conn: Conn| async move { conn.ok(&quot;sequence!&quot;) }
+));
+<span class="boring">}
+</span></code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
 <p>In order for trillium to be a usable web framework, we offer a number of
 core utilities. However, it is our hope that alternative
