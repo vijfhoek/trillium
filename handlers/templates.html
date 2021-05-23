@@ -195,32 +195,31 @@ fn main() {
 <p>Given the following file in the same directory as main.rs (examples in this case),</p>
 <pre><code class="language-django">Hello, {{ name }}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_tera::{TeraConnExt, TeraHandler};
 
 fn main() {
-    trillium_smol_server::run(sequence![
-        TeraHandler::new(&quot;**/*.html&quot;),
-        |conn: Conn| async move { conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;) }
-    ]);
+    trillium_smol_server::run((TeraHandler::new(&quot;**/*.html&quot;), |conn: Conn| async move {
+        conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;)
+    }));
 }
 </code></pre></pre>
 <h3 id="handlebars"><a class="header" href="#handlebars">Handlebars</a></h3>
 <p>Handlebars also offers runtime templating. Given the following file in <code>examples/templates/hello.hbs</code>,</p>
 <pre><code class="language-handlebars">hello {{name}}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_handlebars::{Handlebars, HandlebarsConnExt};
 
 fn main() {
     env_logger::init();
-    trillium_smol_server::run(sequence![
+    trillium_smol_server::run((
         Handlebars::new(&quot;./examples/templates/*.hbs&quot;),
         |conn: Conn| async move {
             conn.assign(&quot;name&quot;, &quot;world&quot;)
                 .render(&quot;examples/templates/hello.hbs&quot;)
-        }
-    ]);
+        },
+    ));
 }
 </code></pre></pre>
 

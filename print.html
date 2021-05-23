@@ -557,32 +557,31 @@ fn main() {
 <p>Given the following file in the same directory as main.rs (examples in this case),</p>
 <pre><code class="language-django">Hello, {{ name }}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_tera::{TeraConnExt, TeraHandler};
 
 fn main() {
-    trillium_smol_server::run(sequence![
-        TeraHandler::new(&quot;**/*.html&quot;),
-        |conn: Conn| async move { conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;) }
-    ]);
+    trillium_smol_server::run((TeraHandler::new(&quot;**/*.html&quot;), |conn: Conn| async move {
+        conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;)
+    }));
 }
 </code></pre></pre>
 <h3 id="handlebars"><a class="header" href="#handlebars">Handlebars</a></h3>
 <p>Handlebars also offers runtime templating. Given the following file in <code>examples/templates/hello.hbs</code>,</p>
 <pre><code class="language-handlebars">hello {{name}}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_handlebars::{Handlebars, HandlebarsConnExt};
 
 fn main() {
     env_logger::init();
-    trillium_smol_server::run(sequence![
+    trillium_smol_server::run((
         Handlebars::new(&quot;./examples/templates/*.hbs&quot;),
         |conn: Conn| async move {
             conn.assign(&quot;name&quot;, &quot;world&quot;)
                 .render(&quot;examples/templates/hello.hbs&quot;)
-        }
-    ]);
+        },
+    ));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
@@ -590,22 +589,19 @@ fn main() {
 loggers. Trillium loggers use the <code>log</code> crate and emit one line at the
 info log level per http request/response pair. We like to use the
 <code>env_logger</code> crate, but any <code>log</code> backend will work equally well.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::sequence;
-use trillium_logger::DevLogger;
-
-pub fn main() {
+<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
     env_logger::init();
-    trillium_smol_server::run(sequence![DevLogger, &quot;ok&quot;]);
+    trillium_smol_server::run((trillium_logger::DevLogger, &quot;ok&quot;));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_cookies::{Cookie, Cookies, CookiesConnExt};
 
 pub fn main() {
     env_logger::init();
 
-    trillium_smol_server::run(sequence![Cookies, |conn: Conn| async move {
+    trillium_smol_server::run((Cookies, |conn: Conn| async move {
         if let Some(cookie_value) = conn.cookies().get(&quot;some_cookie&quot;) {
             println!(&quot;current cookie value: {}&quot;, cookie_value.value());
         }
@@ -615,7 +611,7 @@ pub fn main() {
                 .path(&quot;/&quot;)
                 .finish(),
         )
-    }]);
+    }));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="sessions"><a class="header" href="#sessions">Sessions</a></h2>
@@ -645,21 +641,21 @@ interaction is also present in other frameworks, and is due to the
 fact that regardless of which session store is used, sessions use a
 secure cookie as a unique identifier.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{sequence, Conn};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_sessions::{MemoryStore, SessionConnExt, Sessions};
 
 pub fn main() {
     env_logger::init();
 
-    trillium_smol_server::run(sequence![
+    trillium_smol_server::run((
         trillium_cookies::Cookies,
         Sessions::new(MemoryStore::new(), b&quot;01234567890123456789012345678901123&quot;),
         |conn: Conn| async move {
             let count: usize = conn.session().get(&quot;count&quot;).unwrap_or_default();
             conn.with_session(&quot;count&quot;, count + 1)
                 .ok(format!(&quot;count: {}&quot;, count))
-        }
-    ]);
+        },
+    ));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="proxy"><a class="header" href="#proxy">Proxy</a></h1>
@@ -667,17 +663,16 @@ pub fn main() {
 support reverse proxying requests. There are two tls implementations
 for this client.</p>
 <pre><pre class="playground"><code class="language-rust edition2018">use async_net::TcpStream;
-use trillium::sequence;
 use trillium_client::Rustls;
 use trillium_logger::DevLogger;
 use trillium_proxy::Proxy;
 
 pub fn main() {
     env_logger::init();
-    trillium_smol_server::run(sequence![
+    trillium_smol_server::run((
         DevLogger,
-        Proxy::&lt;Rustls&lt;TcpStream&gt;&gt;::new(&quot;https://httpbin.org/&quot;)
-    ]);
+        Proxy::&lt;Rustls&lt;TcpStream&gt;&gt;::new(&quot;https://httpbin.org/&quot;),
+    ));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>

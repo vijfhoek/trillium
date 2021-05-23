@@ -170,12 +170,9 @@
 loggers. Trillium loggers use the <code>log</code> crate and emit one line at the
 info log level per http request/response pair. We like to use the
 <code>env_logger</code> crate, but any <code>log</code> backend will work equally well.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::sequence;
-use trillium_logger::DevLogger;
-
-pub fn main() {
+<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
     env_logger::init();
-    trillium_smol_server::run(sequence![DevLogger, &quot;ok&quot;]);
+    trillium_smol_server::run((trillium_logger::DevLogger, &quot;ok&quot;));
 }
 </code></pre></pre>
 
