@@ -352,7 +352,7 @@ store types that you define in state.</p>
 <blockquote>
 <p>🌊 Comparison with Tide: Tide has three different types of state:
 Server state, request state, and response state. In Trillium, server
-state is achieved using the <code>trillium::State</code> handler, which holds any
+state is achieved using the <a href="https://docs.trillium.rs/trillium/struct.state"><code>trillium::State</code></a> handler, which holds any
 type that is Clone and puts a clone of it into the state of each
 Conn that passes through the handler.</p>
 </blockquote>
@@ -422,18 +422,39 @@ pub fn main() {
         .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
 }
 </code></pre></pre>
-<h2 id="sequences-and-tuples"><a class="header" href="#sequences-and-tuples">Sequences and Tuples</a></h2>
+<h2 id="tuples-and-sequences"><a class="header" href="#tuples-and-sequences">Tuples and Sequences</a></h2>
 <p>Earlier, we discussed that we can use state to send data between
 handlers and that handlers can always pass along the conn
 unchanged. In order to use this, we need to introduce the notion of
-Sequences. A Sequence is a <code>Vec</code> of handlers, each of which is run on
-the connection until one of the handlers halts the conn.</p>
+Sequences. A Sequence is a <code>Vec</code> of boxed dyn handlers, each of which
+is run on the connection until one of the handlers halts the conn. A
+tuple handler is the generic stack-allocated fixed-length
+equivalent. If you're unsure which to use, start with a tuple.</p>
 <blockquote>
 <p>🔌 Readers familiar with elixir plug will recognize this notion as
 identical to pipelines, and that the term halt <a href="https://hexdocs.pm/plug/Plug.Conn.html#halt/1">is <del>stolen from</del>
 inspired by plug</a></p>
 </blockquote>
+<h3 id="tuple-handlers"><a class="header" href="#tuple-handlers">Tuple handlers</a></h3>
+<p>For sequences of up to 15 handlers with types that are known at
+compile-time, tuples can and should be used. This avoids
+heap-allocating handlers.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>env_logger::init();
+run((
+    trillium_logger::DevLogger,
+    |conn: Conn| async move { conn.ok(&quot;sequence!&quot;) }
+));
+<span class="boring">}
+</span></code></pre></pre>
+<p>This snippet adds a http logger to our application, so that if we
+execute our application with <code>RUST_LOG=info cargo run</code> and make a
+request to localhost:8000, we'll see something like <code>GET / 200 390.706µs 9bytes</code> on stdout.</p>
 <h3 id="building-a-sequence"><a class="header" href="#building-a-sequence">Building a Sequence</a></h3>
+<p>For more information on sequences, see
+<a href="https://docs.trillium.rs/trillium/struct.sequence">trillium::Sequence</a></p>
 <pre><pre class="playground"><code class="language-rust edition2018">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -443,9 +464,6 @@ run(trillium::Sequence::new()
     .and(|conn: Conn| async move { conn.ok(&quot;sequence!&quot;) }));
 <span class="boring">}
 </span></code></pre></pre>
-<p>This snippet adds a http logger to our application, so that if we
-execute our application with <code>RUST_LOG=info cargo run</code> and make a
-request to localhost:8000, we'll see something like <code>GET / 200 390.706µs 9bytes</code> on stdout.</p>
 <h3 id="macros-if-you-want-them"><a class="header" href="#macros-if-you-want-them">Macros, if you want them</a></h3>
 <p>Because sequences are quite common in trillium, we also have a macro that
 makes them even easier to build. Instead of writing
@@ -464,19 +482,6 @@ run(trillium::sequence![
 <p>Sequence is itself a handler, and as a result can be used in any place
 another handler could be used.  If you need to, you can nest sequences
 inside of each other.</p>
-<h3 id="tuples-too"><a class="header" href="#tuples-too">Tuples, too!</a></h3>
-<p>For sequences of up to 15 handlers that are known at compile-time,
-tuples can and should be used. This avoids heap-allocating handlers.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>env_logger::init();
-run((
-    trillium_logger::DevLogger,
-    |conn: Conn| async move { conn.ok(&quot;sequence!&quot;) }
-));
-<span class="boring">}
-</span></code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
 <p>In order for trillium to be a usable web framework, we offer a number of
 core utilities. However, it is our hope that alternative
