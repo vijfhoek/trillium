@@ -213,8 +213,8 @@ it does in fact also own (in the rust sense) the singular
 <code>TcpStream</code> that represents the connection with the http client, and
 dropping a <code>Conn</code> will also disconnect the client as a result.</p>
 </blockquote>
-<p>🚧 TODO: Fill in rustdocs link 🚧
-The rustdocs for Conn contain the full details for all of the things you can do with a conn.</p>
+<p>The <a href="https://docs.trillium.rs/trillium/struct.conn">rustdocs for Conn</a>
+contain the full details for all of the things you can do with a conn.</p>
 <h3 id="returning-conn"><a class="header" href="#returning-conn">Returning Conn</a></h3>
 <p>In general, because you'll be returning <code>Conn</code> from handlers, it
 supports a chainable (fluent) interface for setting properties, like:</p>
