@@ -169,10 +169,10 @@
 <p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
 <h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
 <p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::Static;
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::StaticFileHandler;
 
 pub fn main() {
-    trillium_smol_server::run(Static::new(&quot;../docs/book/&quot;).with_index_file(&quot;index.html&quot;))
+    trillium_smol_server::run(StaticFileHandler::new(&quot;examples&quot;).with_index_file(&quot;index.html&quot;))
 }
 </code></pre></pre>
 <h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
