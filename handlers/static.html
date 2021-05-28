@@ -177,9 +177,11 @@ pub fn main() {
 </code></pre></pre>
 <h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
 <p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiled};
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
 pub fn main() {
-    trillium_smol_server::run(StaticCompiled::new(include_dir!(&quot;./src&quot;)).with_index_file(&quot;lib.rs&quot;));
+    trillium_smol_server::run(
+        StaticCompiledHandler::new(include_dir!(&quot;./examples/files&quot;)).with_index_file(&quot;lib.rs&quot;),
+    );
 }
 </code></pre></pre>
 
