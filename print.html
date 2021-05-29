@@ -571,7 +571,7 @@ use trillium_cookies::{cookie::Cookie, CookiesConnExt, CookiesHandler};
 pub fn main() {
     env_logger::init();
 
-    trillium_smol_server::run((CookiesHandler, |conn: Conn| async move {
+    trillium_smol_server::run((CookiesHandler::new(), |conn: Conn| async move {
         if let Some(cookie_value) = conn.cookies().get(&quot;some_cookie&quot;) {
             println!(&quot;current cookie value: {}&quot;, cookie_value.value());
         }
@@ -620,7 +620,7 @@ pub fn main() {
     env_logger::init();
 
     trillium_smol_server::run((
-        CookiesHandler,
+        CookiesHandler::new(),
         SessionHandler::new(MemoryStore::new(), b&quot;01234567890123456789012345678901123&quot;),
         |conn: Conn| async move {
             let count: usize = conn.session().get(&quot;count&quot;).unwrap_or_default();
