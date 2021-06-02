@@ -294,12 +294,12 @@ server and it will respond to http requests for us. We're using the
 <a href="https://github.com/smol-rs/smol"><code>smol</code></a>-runtime based server adapter
 here.</p>
 <pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
-    trillium_smol_server::run(hello_world);
+    trillium_smol::run(hello_world);
 }
 </code></pre></pre>
 <p>We can also define this as a closure:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
-    trillium_smol_server::run(|conn: trillium::Conn| async move {
+    trillium_smol::run(|conn: trillium::Conn| async move {
         conn.ok(&quot;hello world&quot;)
     });
 }
@@ -367,15 +367,15 @@ for Conn that offer session support. In general, handlers that put
 data into conn state also will provide convenience functions for
 accessing that state, and will export a <code>[Something]ConnExt</code> trait.</p>
 <h2 id="servers"><a class="header" href="#servers">Servers</a></h2>
-<p>Let's talk a little more about that <code>trillium_smol_server::run</code> line we've
+<p>Let's talk a little more about that <code>trillium_smol::run</code> line we've
 been writing. Trillium itself is built on <code>futures</code> (<code>futures-lite</code>,
 specifically). In order to run it, it needs an adapter to an async
 runtime. These adapters are called servers, and there are four of them
 currently:</p>
 <ul>
-<li><code>trillium_async_std_server</code></li>
-<li><code>trillium_smol_server</code></li>
-<li><code>trillium_tokio_server</code></li>
+<li><code>trillium_async_std</code></li>
+<li><code>trillium_smol</code></li>
+<li><code>trillium_tokio</code></li>
 <li><code>trillium_aws_lambda_server</code></li>
 </ul>
 <p>Although we've been using the smol server in these docs thus far, you
@@ -384,7 +384,7 @@ dependency on async-std or tokio anyway, you might as well use the
 server for that runtime.</p>
 <p>To run trillium on a different host or port, either provide a <code>HOST</code> and/or <code>PORT</code> environment variables, or compile the specific values into the server as follows:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
-    trillium_smol_server::config()
+    trillium_smol::config()
         .with_port(1337)
         .with_host(&quot;127.0.0.1&quot;)
         .run(|conn: trillium::Conn| async move { conn.ok(&quot;hello world&quot;) })
@@ -396,29 +396,27 @@ termination at the load balancer, each of the above servers can be
 combined with either rustls or native-tls.</p>
 <p>Rustls:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
-use trillium_rustls::RustTls;
+use trillium_rustls::RustlsAcceptor;
 
 const KEY: &amp;[u8] = include_bytes!(&quot;./key.pem&quot;);
 const CERT: &amp;[u8] = include_bytes!(&quot;./cert.pem&quot;);
 
 pub fn main() {
     env_logger::init();
-    trillium_smol_server::config()
-        .with_acceptor(RustTls::from_pkcs8(CERT, KEY))
+    trillium_smol::config()
+        .with_acceptor(RustlsAcceptor::from_pkcs8(CERT, KEY))
         .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
 }
 </code></pre></pre>
 <p>Native tls:</p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
-use trillium_native_tls::NativeTls;
+use trillium_native_tls::NativeTlsAcceptor;
 
 pub fn main() {
     env_logger::init();
-    trillium_smol_server::config()
-        .with_acceptor(NativeTls::from_pkcs12(
-            include_bytes!(&quot;./identity.p12&quot;),
-            &quot;changeit&quot;,
-        ))
+    let acceptor = NativeTlsAcceptor::from_pkcs12(include_bytes!(&quot;./identity.p12&quot;), &quot;changeit&quot;);
+    trillium_smol::config()
+        .with_acceptor(acceptor)
         .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
 }
 </code></pre></pre>
@@ -486,7 +484,7 @@ use trillium_router::{Router, RouterConnExt};
 
 pub fn main() {
     env_logger::init();
-    trillium_smol_server::run(
+    trillium_smol::run(
         Router::new()
             .get(&quot;/&quot;, |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) })
             .get(&quot;/hello/:planet&quot;, |conn: Conn| async move {
@@ -517,9 +515,7 @@ struct HelloTemplate&lt;'a&gt; {
 }
 
 fn main() {
-    trillium_smol_server::run(
-        |conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) },
-    );
+    trillium_smol::run(|conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) });
 }
 </code></pre></pre>
 <h3 id="tera"><a class="header" href="#tera">Tera</a></h3>
@@ -531,7 +527,7 @@ fn main() {
 use trillium_tera::{TeraConnExt, TeraHandler};
 
 fn main() {
-    trillium_smol_server::run((TeraHandler::new(&quot;**/*.html&quot;), |conn: Conn| async move {
+    trillium_smol::run((TeraHandler::new(&quot;**/*.html&quot;), |conn: Conn| async move {
         conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;)
     }));
 }
@@ -545,7 +541,7 @@ use trillium_handlebars::{HandlebarsConnExt, HandlebarsHandler};
 
 fn main() {
     env_logger::init();
-    trillium_smol_server::run((
+    trillium_smol::run((
         HandlebarsHandler::new(&quot;./examples/templates/*.hbs&quot;),
         |conn: Conn| async move {
             conn.assign(&quot;name&quot;, &quot;world&quot;)
@@ -561,7 +557,7 @@ info log level per http request/response pair. We like to use the
 <code>env_logger</code> crate, but any <code>log</code> backend will work equally well.</p>
 <pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
     env_logger::init();
-    trillium_smol_server::run((trillium_logger::DevLogger, &quot;ok&quot;));
+    trillium_smol::run((trillium_logger::DevLogger, &quot;ok&quot;));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
@@ -571,7 +567,7 @@ use trillium_cookies::{cookie::Cookie, CookiesConnExt, CookiesHandler};
 pub fn main() {
     env_logger::init();
 
-    trillium_smol_server::run((CookiesHandler::new(), |conn: Conn| async move {
+    trillium_smol::run((CookiesHandler::new(), |conn: Conn| async move {
         if let Some(cookie_value) = conn.cookies().get(&quot;some_cookie&quot;) {
             println!(&quot;current cookie value: {}&quot;, cookie_value.value());
         }
@@ -619,7 +615,7 @@ use trillium_sessions::{MemoryStore, SessionConnExt, SessionHandler};
 pub fn main() {
     env_logger::init();
 
-    trillium_smol_server::run((
+    trillium_smol::run((
         CookiesHandler::new(),
         SessionHandler::new(MemoryStore::new(), b&quot;01234567890123456789012345678901123&quot;),
         |conn: Conn| async move {
@@ -634,17 +630,12 @@ pub fn main() {
 <p>Trillium includes a custom http client implementation in order to
 support reverse proxying requests. There are two tls implementations
 for this client.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use async_net::TcpStream;
-use trillium_client::Rustls;
-use trillium_logger::DevLogger;
-use trillium_proxy::Proxy;
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium_logger::DevLogger;
+type Proxy = trillium_proxy::Proxy&lt;trillium_rustls::RustlsConnector&lt;trillium_smol::TcpConnector&gt;&gt;;
 
 pub fn main() {
     env_logger::init();
-    trillium_smol_server::run((
-        DevLogger,
-        Proxy::&lt;Rustls&lt;TcpStream&gt;&gt;::new(&quot;https://httpbin.org/&quot;),
-    ));
+    trillium_smol::run((DevLogger, Proxy::new(&quot;https://httpbin.org/&quot;)));
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
@@ -654,7 +645,7 @@ pub fn main() {
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::{crate_relative_path, StaticFileHandler};
 
 pub fn main() {
-    trillium_smol_server::run(
+    trillium_smol::run(
         StaticFileHandler::new(crate_relative_path!(&quot;examples/files&quot;))
             .with_index_file(&quot;index.html&quot;),
     )
@@ -664,7 +655,7 @@ pub fn main() {
 <p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
 pub fn main() {
-    trillium_smol_server::run(
+    trillium_smol::run(
         StaticCompiledHandler::new(include_dir!(&quot;./examples/files&quot;)).with_index_file(&quot;lib.rs&quot;),
     );
 }
@@ -681,7 +672,7 @@ use trillium_websockets::{Message, WebSocket};
 pub fn main() {
     env_logger::init();
 
-    trillium_smol_server::run(WebSocket::new(|mut websocket| async move {
+    trillium_smol::run(WebSocket::new(|mut websocket| async move {
         while let Some(Ok(Message::Text(input))) = websocket.next().await {
             websocket
                 .send_string(format!(&quot;received your message: {}&quot;, &amp;input))

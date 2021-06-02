@@ -185,9 +185,7 @@ struct HelloTemplate&lt;'a&gt; {
 }
 
 fn main() {
-    trillium_smol_server::run(
-        |conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) },
-    );
+    trillium_smol::run(|conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) });
 }
 </code></pre></pre>
 <h3 id="tera"><a class="header" href="#tera">Tera</a></h3>
@@ -199,7 +197,7 @@ fn main() {
 use trillium_tera::{TeraConnExt, TeraHandler};
 
 fn main() {
-    trillium_smol_server::run((TeraHandler::new(&quot;**/*.html&quot;), |conn: Conn| async move {
+    trillium_smol::run((TeraHandler::new(&quot;**/*.html&quot;), |conn: Conn| async move {
         conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;)
     }));
 }
@@ -213,7 +211,7 @@ use trillium_handlebars::{HandlebarsConnExt, HandlebarsHandler};
 
 fn main() {
     env_logger::init();
-    trillium_smol_server::run((
+    trillium_smol::run((
         HandlebarsHandler::new(&quot;./examples/templates/*.hbs&quot;),
         |conn: Conn| async move {
             conn.assign(&quot;name&quot;, &quot;world&quot;)
