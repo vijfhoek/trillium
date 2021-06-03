@@ -267,7 +267,7 @@ inspired by plug</a></p>
 </span><span class="boring">fn main() {
 </span>env_logger::init();
 run((
-    trillium_logger::DevLogger,
+    trillium_logger::Logger,
     |conn: Conn| async move { conn.ok(&quot;tuple!&quot;) }
 ));
 <span class="boring">}
