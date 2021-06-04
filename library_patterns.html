@@ -3,10 +3,8 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title></title>
+        <title>Patterns for library authors - trillium</title>
         
-        
-        <base href="/">
         
 
 
@@ -97,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li></ol></li><li class="chapter-item expanded "><a href="handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="handlers/router.html"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="library_patterns.html"><strong aria-hidden="true">4.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">5.</strong> Contributing</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li></ol></li><li class="chapter-item expanded "><a href="handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="handlers/router.html"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="library_patterns.html" class="active"><strong aria-hidden="true">4.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">5.</strong> Contributing</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,15 +165,96 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
-<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
+                        <h1 id="patterns-for-library-authors"><a class="header" href="#patterns-for-library-authors">Patterns for library authors</a></h1>
+<h2 id="state"><a class="header" href="#state">State</a></h2>
+<p>Let's take a look at an implementation of a library that incrementally counts the number of conns that pass through it and attaches the number to each conn. It would be unsafe to store a u64 directly in the state set, because other libraries might be doing so, so we wrap it with a private newtype called ConnNumber. Since this isn't accessible outside of our library, we can be sure that our handler is the only place that sets it.  We provide a ConnExt trait in order to provide access to this data.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>mod conn_counter {
+    use std::sync::{
+        atomic::{AtomicU64, Ordering},
+        Arc,
+    };
+    use trillium::{async_trait, Conn, Handler};
+
+    struct ConnNumber(u64);
+
+    #[derive(Default)]
+    pub struct ConnCounterHandler(Arc&lt;AtomicU64&gt;);
+
+    impl ConnCounterHandler {
+        pub fn new() -&gt; Self {
+            Self::default()
+        }
+    }
+
+    #[async_trait]
+    impl Handler for ConnCounterHandler {
+        async fn run(&amp;self, conn: Conn) -&gt; Conn {
+            let number = self.0.fetch_add(1, Ordering::SeqCst);
+            conn.with_state(ConnNumber(number))
+        }
+    }
+
+    pub trait ConnCounterConnExt {
+        fn conn_number(&amp;self) -&gt; u64;
+    }
+
+    impl ConnCounterConnExt for Conn {
+        fn conn_number(&amp;self) -&gt; u64 {
+            self.state::&lt;ConnNumber&gt;()
+                .expect(&quot;conn_number must be called after the handler&quot;)
+                .0
+        }
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>And usage of the library looks like this:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use conn_counter::{ConnCounterConnExt, ConnCounterHandler};
+use trillium::{Conn, Handler};
+
+fn handler() -&gt; impl Handler {
+    (ConnCounterHandler::new(), |conn: Conn| async move {
+        let conn_number = conn.conn_number();
+        conn.ok(format!(&quot;conn number was {}&quot;, conn_number))
+    })
+}
+
+fn main() {
+    trillium_smol::run(handler());
+}
+
+#[cfg(test)]
+mod test {
+    use trillium_testing::{assert_ok, HandlerTesting};
+
+    #[test]
+    fn test_conn_counter() {
+        let handler = super::handler();
+        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 0&quot;);
+        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 1&quot;);
+        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 2&quot;);
+        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 3&quot;);
+    }
+}
+</code></pre></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="handlers/websockets.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
+                        
+                            <a rel="next" href="contributing.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -185,7 +264,15 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a rel="prev" href="handlers/websockets.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
+                
+                    <a rel="next" href="contributing.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 
