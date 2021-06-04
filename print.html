@@ -912,15 +912,15 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use trillium_testing::{assert_ok, HandlerTesting};
+    use trillium_testing::{assert_ok, methods::*};
 
     #[test]
     fn test_conn_counter() {
         let handler = super::handler();
-        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 0&quot;);
-        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 1&quot;);
-        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 2&quot;);
-        assert_ok!(handler.get(&quot;/&quot;), &quot;conn number was 3&quot;);
+        assert_ok!(get(&quot;/&quot;).on(&amp;handler), &quot;conn number was 0&quot;);
+        assert_ok!(get(&quot;/&quot;).on(&amp;handler), &quot;conn number was 1&quot;);
+        assert_ok!(get(&quot;/&quot;).on(&amp;handler), &quot;conn number was 2&quot;);
+        assert_ok!(get(&quot;/&quot;).on(&amp;handler), &quot;conn number was 3&quot;);
     }
 }
 </code></pre></pre>
