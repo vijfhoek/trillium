@@ -166,6 +166,73 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="testing-trillium-applications"><a class="header" href="#testing-trillium-applications">Testing trillium applications</a></h1>
+<p>Trillium provides a testing crate that intends to provide both
+&quot;functional/unit testing&quot; and &quot;integration testing&quot; of trillium
+applications.</p>
+<p><a href="https://docs.trillium.rs/trillium_testing">rustdocs (main)</a></p>
+<p>Given a totally-contrived application like this:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, Conn, Handler};
+use trillium_logger::Logger;
+
+async fn teapot(mut conn: Conn) -&gt; Conn {
+    let request_body = conn_try!(conn, conn.request_body_string().await);
+    if request_body.is_empty() {
+        conn.with_status(406).with_body(&quot;unacceptable!&quot;).halt()
+    } else {
+        conn.with_body(format!(&quot;request body was: {}&quot;, request_body))
+            .with_status(418)
+            .with_header((&quot;server&quot;, &quot;zojirushi&quot;))
+    }
+}
+
+fn application() -&gt; impl Handler {
+    (Logger::new(), teapot)
+}
+
+fn main() {
+    trillium_smol::run(application());
+}
+</code></pre></pre>
+<p>Here's what some simple tests would look like:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[cfg(test)]
+mod tests {
+    use super::{application, teapot};
+    use trillium_testing::prelude::*;
+
+    #[test]
+    fn handler_sends_correct_headers_and_is_a_teapot() {
+        assert_response!(
+            post(&quot;/&quot;).with_request_body(&quot;hello trillium!&quot;).on(&amp;application),
+            StatusCode::ImATeapot,
+            &quot;request body was: hello trillium!&quot;,
+            &quot;server&quot; =&gt; &quot;zojirushi&quot;,
+            &quot;content-length&quot; =&gt; &quot;33&quot;
+
+        );
+    }
+
+    #[test]
+    fn we_can_also_test_the_individual_handler() {
+        assert_body!(
+            post(&quot;/&quot;).with_request_body(&quot;a different body&quot;).on(&amp;teapot),
+            &quot;request body was: a different body&quot;
+        );
+    }
+
+    #[test]
+    fn application_is_lemongrab_when_body_is_empty() {
+        assert_response!(
+            post(&quot;/&quot;).on(&amp;application),
+            StatusCode::NotAcceptable,
+            &quot;unacceptable!&quot;
+        );
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
 
                     </main>
 

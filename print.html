@@ -500,13 +500,13 @@ combined with either rustls or native-tls.</p>
 <span class="boring">}
 </span></code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
-<p>In order for trillium to be a usable web framework, we offer a number of
-core utilities. However, it is our hope that alternative
+<p>In order for trillium to be a usable web framework, we offer a number
+of core utilities. However, it is my hope that alternative
 implementations for at least some of these will exist in order to
 explore the design space and accommodate different design constraints
 and tradeoffs. Because not every application will need this
-functionality, they are each released as distinct crates from the
-core of trillium.</p>
+functionality, they are each released as distinct crates from the core
+of trillium.</p>
 <ul>
 <li><a href="./handlers/logger.html">Logger</a></li>
 <li><a href="./handlers/cookies.html">Cookies</a></li>
@@ -839,6 +839,73 @@ such as request headers, the request path and method, and any state
 that has been accumulated by previous handlers in a sequence.</p>
 </blockquote>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="testing-trillium-applications"><a class="header" href="#testing-trillium-applications">Testing trillium applications</a></h1>
+<p>Trillium provides a testing crate that intends to provide both
+&quot;functional/unit testing&quot; and &quot;integration testing&quot; of trillium
+applications.</p>
+<p><a href="https://docs.trillium.rs/trillium_testing">rustdocs (main)</a></p>
+<p>Given a totally-contrived application like this:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, Conn, Handler};
+use trillium_logger::Logger;
+
+async fn teapot(mut conn: Conn) -&gt; Conn {
+    let request_body = conn_try!(conn, conn.request_body_string().await);
+    if request_body.is_empty() {
+        conn.with_status(406).with_body(&quot;unacceptable!&quot;).halt()
+    } else {
+        conn.with_body(format!(&quot;request body was: {}&quot;, request_body))
+            .with_status(418)
+            .with_header((&quot;server&quot;, &quot;zojirushi&quot;))
+    }
+}
+
+fn application() -&gt; impl Handler {
+    (Logger::new(), teapot)
+}
+
+fn main() {
+    trillium_smol::run(application());
+}
+</code></pre></pre>
+<p>Here's what some simple tests would look like:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[cfg(test)]
+mod tests {
+    use super::{application, teapot};
+    use trillium_testing::prelude::*;
+
+    #[test]
+    fn handler_sends_correct_headers_and_is_a_teapot() {
+        assert_response!(
+            post(&quot;/&quot;).with_request_body(&quot;hello trillium!&quot;).on(&amp;application),
+            StatusCode::ImATeapot,
+            &quot;request body was: hello trillium!&quot;,
+            &quot;server&quot; =&gt; &quot;zojirushi&quot;,
+            &quot;content-length&quot; =&gt; &quot;33&quot;
+
+        );
+    }
+
+    #[test]
+    fn we_can_also_test_the_individual_handler() {
+        assert_body!(
+            post(&quot;/&quot;).with_request_body(&quot;a different body&quot;).on(&amp;teapot),
+            &quot;request body was: a different body&quot;
+        );
+    }
+
+    #[test]
+    fn application_is_lemongrab_when_body_is_empty() {
+        assert_response!(
+            post(&quot;/&quot;).on(&amp;application),
+            StatusCode::NotAcceptable,
+            &quot;unacceptable!&quot;
+        );
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="patterns-for-library-authors"><a class="header" href="#patterns-for-library-authors">Patterns for library authors</a></h1>
 <h2 id="state-1"><a class="header" href="#state-1">State</a></h2>
 <p>Let's take a look at an implementation of a library that incrementally counts the number of conns that pass through it and attaches the number to each conn. It would be unsafe to store a u64 directly in the state set, because other libraries might be doing so, so we wrap it with a private newtype called ConnNumber. Since this isn't accessible outside of our library, we can be sure that our handler is the only place that sets it.  We provide a ConnExt trait in order to provide access to this data.</p>
