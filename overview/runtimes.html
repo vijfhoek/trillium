@@ -187,32 +187,45 @@ trillium between runtimes at any point.</p>
 <p>To run trillium on a different host or port, either provide a <code>HOST</code>
 and/or <code>PORT</code> environment variables, or compile the specific values
 into the application as follows:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>{{#include ../../smol/examples/smol-with-config.rs}}
-<span class="boring">}
-</span></code></pre></pre>
+<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
+    trillium_smol::config()
+        .with_port(1337)
+        .with_host(&quot;127.0.0.1&quot;)
+        .run(|conn: trillium::Conn| async move { conn.ok(&quot;hello world&quot;) })
+}
+</code></pre></pre>
 <h2 id="tls--https"><a class="header" href="#tls--https">TLS / HTTPS</a></h2>
 <p>With the exception of aws lambda, which provides its own tls
 termination at the load balancer, each of the above servers can be
 combined with either rustls or native-tls.</p>
 <h3 id="rustls"><a class="header" href="#rustls">Rustls:</a></h3>
 <p><a href="https://docs.trillium.rs/trillium_rustls/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>{{#include ../../rustls/examples/rustls.rs}}
-<span class="boring">}
-</span></code></pre></pre>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+use trillium_rustls::RustlsAcceptor;
+
+const KEY: &amp;[u8] = include_bytes!(&quot;./key.pem&quot;);
+const CERT: &amp;[u8] = include_bytes!(&quot;./cert.pem&quot;);
+
+pub fn main() {
+    env_logger::init();
+    trillium_smol::config()
+        .with_acceptor(RustlsAcceptor::from_pkcs8(CERT, KEY))
+        .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
+}
+</code></pre></pre>
 <h3 id="native-tls"><a class="header" href="#native-tls">Native tls:</a></h3>
 <p><a href="https://docs.trillium.rs/trillium_native_tls/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>{{#include ../../native-tls/examples/native-tls.rs}}
-<span class="boring">}
-</span></code></pre></pre>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+use trillium_native_tls::NativeTlsAcceptor;
+
+pub fn main() {
+    env_logger::init();
+    let acceptor = NativeTlsAcceptor::from_pkcs12(include_bytes!(&quot;./identity.p12&quot;), &quot;changeit&quot;);
+    trillium_smol::config()
+        .with_acceptor(acceptor)
+        .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
+}
+</code></pre></pre>
 
                     </main>
 
