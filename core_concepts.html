@@ -266,8 +266,9 @@ inspired by plug</a></p>
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env_logger::init();
+use trillium_logger::Logger;
 run((
-    trillium_logger::Logger,
+    Logger::new(),
     |conn: Conn| async move { conn.ok(&quot;tuple!&quot;) }
 ));
 <span class="boring">}
@@ -284,12 +285,13 @@ types. Instead, to use sessions as an example, <code>trillium_sessions</code>
 provides a <code>SessionConnExt</code> trait which provides associated functions
 for Conn that offer session support. In general, handlers that put
 data into conn state also will provide convenience functions for
-accessing that state, and will export a <code>[Something]ConnExt</code> trait.</p>
-<h2 id="servers"><a class="header" href="#servers">Servers</a></h2>
+accessing that state, and will export a <code>[Something]ConnExt</code> trait. <sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<p><sup class="footnote-reference"><a href="#1">1</a></sup> 🧑‍🎓 see <a href="library_patterns.html">library_patterns</a> for an example of authoring one of these</p>
+<h2 id="runtime-adapters"><a class="header" href="#runtime-adapters">Runtime Adapters</a></h2>
 <p>Let's talk a little more about that <code>trillium_smol::run</code> line we've
 been writing. Trillium itself is built on <code>futures</code> (<code>futures-lite</code>,
 specifically). In order to run it, it needs an adapter to an async
-runtime. These adapters are called servers, and there are four of them
+runtime. There there are four of these
 currently:</p>
 <ul>
 <li><code>trillium_async_std</code></li>
@@ -300,7 +302,8 @@ currently:</p>
 <p>Although we've been using the smol server in these docs thus far, you
 should use whichever runtime you prefer. If you expect to have a
 dependency on async-std or tokio anyway, you might as well use the
-server for that runtime.</p>
+server for that runtime. If you're new to async rust or don't have an
+opinion, I recommend starting with trillium_smol. It is easy to switch trillium between runtimes at any point.</p>
 <p>To run trillium on a different host or port, either provide a <code>HOST</code>
 and/or <code>PORT</code> environment variables, or compile the specific values
 into the server as follows:</p>
