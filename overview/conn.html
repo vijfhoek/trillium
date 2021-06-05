@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Static Files - trillium</title>
+        <title>Conn - trillium</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="../conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../overview/core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li><li class="chapter-item expanded "><a href="../overview/handlers.html"><strong aria-hidden="true">2.2.</strong> Handlers</a></li><li class="chapter-item expanded "><a href="../overview/conn.html"><strong aria-hidden="true">2.3.</strong> Conn</a></li><li class="chapter-item expanded "><a href="../overview/runtimes.html"><strong aria-hidden="true">2.4.</strong> Runtime Adapters and TLS</a></li></ol></li><li class="chapter-item expanded "><a href="../handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../handlers/router.html"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="../handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="../handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="../handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="../handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="../handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="../handlers/static.html" class="active"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="../handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="../testing.html"><strong aria-hidden="true">4.</strong> Testing trillium applications</a></li><li class="chapter-item expanded "><a href="../library_patterns.html"><strong aria-hidden="true">5.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="../contributing.html"><strong aria-hidden="true">6.</strong> Contributing</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="../conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../overview/core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li><li class="chapter-item expanded "><a href="../overview/handlers.html"><strong aria-hidden="true">2.2.</strong> Handlers</a></li><li class="chapter-item expanded "><a href="../overview/conn.html" class="active"><strong aria-hidden="true">2.3.</strong> Conn</a></li><li class="chapter-item expanded "><a href="../overview/runtimes.html"><strong aria-hidden="true">2.4.</strong> Runtime Adapters and TLS</a></li></ol></li><li class="chapter-item expanded "><a href="../handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../handlers/router.html"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="../handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="../handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="../handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="../handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="../handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="../handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="../handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="../testing.html"><strong aria-hidden="true">4.</strong> Testing trillium applications</a></li><li class="chapter-item expanded "><a href="../library_patterns.html"><strong aria-hidden="true">5.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="../contributing.html"><strong aria-hidden="true">6.</strong> Contributing</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -165,43 +165,81 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
-<p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
-<h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
-<p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
-<p><a href="https://docs.trillium.rs/trillium_static/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::{crate_relative_path, StaticFileHandler};
-
-pub fn main() {
-    trillium_smol::run(
-        StaticFileHandler::new(crate_relative_path!(&quot;examples/files&quot;))
-            .with_index_file(&quot;index.html&quot;),
-    )
-}
-</code></pre></pre>
-<h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
-<p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
-<p><a href="https://docs.trillium.rs/trillium_static_compiled/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
-pub fn main() {
-    trillium_smol::run(
-        StaticCompiledHandler::new(include_dir!(&quot;./examples/files&quot;)).with_index_file(&quot;lib.rs&quot;),
-    );
-}
-</code></pre></pre>
+                        <h1 id="conn"><a class="header" href="#conn">Conn</a></h1>
+<p>Before we explore the concept of a handler further, let's take a look
+at <code>Conn</code>. As mentioned above, <code>Conn</code> represents both the request and
+response, as well as any data your application associates with that
+request-response cycle.</p>
+<blockquote>
+<p>🧑‍🎓 Advanced aside: Although the naming of Conn is directly
+borrowed from Elixir's <a href="https://github.com/elixir-plug/plug"><code>plug</code></a>
+and therefore also <a href="https://www.phoenixframework.org/"><code>Phoenix</code></a>,
+it does in fact also own (in the rust sense) the singular
+<code>TcpStream</code> that represents the connection with the http client, and
+dropping a <code>Conn</code> will also disconnect the client as a result.</p>
+</blockquote>
+<p>The <a href="https://docs.trillium.rs/trillium/struct.conn">rustdocs for Conn</a>
+contain the full details for all of the things you can do with a conn.</p>
+<h2 id="returning-conn"><a class="header" href="#returning-conn">Returning Conn</a></h2>
+<p>In general, because you'll be returning <code>Conn</code> from handlers, it
+supports a chainable (fluent) interface for setting properties, like:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>conn.with_status(202)
+    .with_header((&quot;content-type&quot;, &quot;application/something-custom&quot;))
+    .with_body(&quot;this is my custom body&quot;)
+<span class="boring">}
+</span></code></pre></pre>
+<h2 id="accessing-http-request-properties"><a class="header" href="#accessing-http-request-properties">Accessing http request properties</a></h2>
+<p>Conn also contains read-only properties like request headers, request
+path, and request method, each of which have getter associated
+functions.</p>
+<h2 id="default-response"><a class="header" href="#default-response">Default Response</a></h2>
+<p>The default response for a Conn is a 404 with no response body, so it
+is always valid to return the Conn from a handler unmodified (<code>|conn: Conn| async move { conn }</code> is the simplest valid handler).</p>
+<h2 id="state"><a class="header" href="#state">State</a></h2>
+<p>In addition to holding the request properties and accumulating the
+response your application is going to send, a Conn also serves as a
+data structure for any information your application needs to associate
+with that request. This is especially valuable for communicating
+between handlers, and most core handlers are implemented using conn
+state. One important caveat to is that each Conn can only contain
+exactly one of each type, so it is highly recommended that you only
+store types that you define in state.</p>
+<blockquote>
+<p>🌊 Comparison with Tide: Tide has three different types of state:
+Server state, request state, and response state. In Trillium, server
+state is achieved using the
+<a href="https://docs.trillium.rs/trillium/struct.state"><code>trillium::State</code></a>
+handler, which holds any type that is Clone and puts a clone of it
+into the state of each Conn that passes through the handler.</p>
+</blockquote>
+<h2 id="extending-conn"><a class="header" href="#extending-conn">Extending Conn</a></h2>
+<p>It is a very common pattern in trillium for libraries to extend Conn
+in order to provide additional functionality<sup class="footnote-reference"><a href="#1">1</a></sup>. The Conn interface
+does not provide support for sessions, cookies, route params, or many
+other building blocks that other frameworks build into the core
+types. Instead, to use sessions as an example, <code>trillium_sessions</code>
+provides a <code>SessionConnExt</code> trait which provides associated functions
+for Conn that offer session support. In general, handlers that put
+data into conn state also will provide convenience functions for
+accessing that state, and will export a <code>[Something]ConnExt</code> trait.</p>
+<p><sup class="footnote-reference"><a href="#1">1</a></sup> 🧑‍🎓 see <a href="../library_patterns.html">library_patterns</a> for an example
+of authoring one of these</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../handlers/proxy.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../overview/handlers.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../handlers/websockets.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../overview/runtimes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -213,13 +251,13 @@ pub fn main() {
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../handlers/proxy.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../overview/handlers.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="../handlers/websockets.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../overview/runtimes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

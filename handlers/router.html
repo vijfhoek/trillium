@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="../conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li></ol></li><li class="chapter-item expanded "><a href="../handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../handlers/router.html" class="active"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="../handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="../handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="../handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="../handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="../handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="../handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="../handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="../library_patterns.html"><strong aria-hidden="true">4.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="../contributing.html"><strong aria-hidden="true">5.</strong> Contributing</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="../conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="../architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../overview/core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li><li class="chapter-item expanded "><a href="../overview/handlers.html"><strong aria-hidden="true">2.2.</strong> Handlers</a></li><li class="chapter-item expanded "><a href="../overview/conn.html"><strong aria-hidden="true">2.3.</strong> Conn</a></li><li class="chapter-item expanded "><a href="../overview/runtimes.html"><strong aria-hidden="true">2.4.</strong> Runtime Adapters and TLS</a></li></ol></li><li class="chapter-item expanded "><a href="../handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../handlers/router.html" class="active"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="../handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="../handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="../handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="../handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="../handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="../handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="../handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="../testing.html"><strong aria-hidden="true">4.</strong> Testing trillium applications</a></li><li class="chapter-item expanded "><a href="../library_patterns.html"><strong aria-hidden="true">5.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="../contributing.html"><strong aria-hidden="true">6.</strong> Contributing</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -165,7 +165,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="router"><a class="header" href="#router">Router</a></h2>
+                        <h1 id="router"><a class="header" href="#router">Router</a></h1>
+<p><a href="https://docs.trillium.rs/trillium_router/index.html">rustdocs (main)</a></p>
 <p>The trillium router is based on
 <a href="https://github.com/jbr/routefinder">routefinder</a>. This router
 supports two types of patterns: Untyped params and a single
@@ -195,6 +196,65 @@ pub fn main() {
                 conn.ok(response_body)
             }),
     );
+}
+</code></pre></pre>
+<h2 id="nesting"><a class="header" href="#nesting">Nesting</a></h2>
+<p>Trillium also supports nesting routers, making it possible to express
+complex sub-applications, vaguely along the lines of a <a href="https://guides.rubyonrails.org/engines.html">rails
+engine</a>. When there are
+additional types of routers, it will be possible for an application
+built with one type of router to be published as a crate and nested
+inside of another router as long as they depend on a compatible
+version of the <code>trillium</code> crate.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, conn_unwrap, Conn, Handler};
+use trillium_logger::Logger;
+use trillium_router::{Router, RouterConnExt};
+
+struct User {
+    id: usize,
+}
+
+mod nested_app {
+    use super::*;
+    async fn load_user(conn: Conn) -&gt; Conn {
+        let id = conn_try!(conn, conn.param(&quot;user_id&quot;).unwrap().parse());
+        let user = User { id }; // imagine we were loading a user from a database here
+        conn.with_state(user)
+    }
+
+    async fn greeting(mut conn: Conn) -&gt; Conn {
+        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
+        conn.ok(format!(&quot;hello user {}&quot;, user.id))
+    }
+
+    async fn post(mut conn: Conn) -&gt; Conn {
+        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
+        let body = conn_try!(conn, conn.request_body_string().await);
+        conn.ok(format!(&quot;hello user {}, {}&quot;, user.id, body))
+    }
+
+    async fn some_other_route(conn: Conn) -&gt; Conn {
+        conn.ok(&quot;this is an uninspired example&quot;)
+    }
+
+    pub fn handler() -&gt; impl Handler {
+        (
+            load_user,
+            Router::new()
+                .get(&quot;/greeting&quot;, greeting)
+                .get(&quot;/some/other/route&quot;, some_other_route)
+                .post(&quot;/post&quot;, post),
+        )
+    }
+}
+pub fn main() {
+    env_logger::init();
+    trillium_smol::run((
+        Logger::new(),
+        Router::new()
+            .get(&quot;/&quot;, |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) })
+            .any(&quot;/users/:user_id/*&quot;, nested_app::handler()),
+    ));
 }
 </code></pre></pre>
 

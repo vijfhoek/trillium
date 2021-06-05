@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li></ol></li><li class="chapter-item expanded "><a href="handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="handlers/router.html"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="library_patterns.html"><strong aria-hidden="true">4.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">5.</strong> Contributing</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="welcome.html"><strong aria-hidden="true">1.</strong> Welcome</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="who.html"><strong aria-hidden="true">1.1.</strong> Who is behind this</a></li><li class="chapter-item expanded "><a href="conventions.html"><strong aria-hidden="true">1.2.</strong> About this document</a></li></ol></li><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">2.</strong> Architectural Overview</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="overview/core_concepts.html"><strong aria-hidden="true">2.1.</strong> Core Concepts</a></li><li class="chapter-item expanded "><a href="overview/handlers.html"><strong aria-hidden="true">2.2.</strong> Handlers</a></li><li class="chapter-item expanded "><a href="overview/conn.html"><strong aria-hidden="true">2.3.</strong> Conn</a></li><li class="chapter-item expanded "><a href="overview/runtimes.html"><strong aria-hidden="true">2.4.</strong> Runtime Adapters and TLS</a></li></ol></li><li class="chapter-item expanded "><a href="handlers.html"><strong aria-hidden="true">3.</strong> A tour of handler libraries</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="handlers/router.html"><strong aria-hidden="true">3.1.</strong> Router</a></li><li class="chapter-item expanded "><a href="handlers/templates.html"><strong aria-hidden="true">3.2.</strong> Template Engines</a></li><li class="chapter-item expanded "><a href="handlers/logger.html"><strong aria-hidden="true">3.3.</strong> Logger</a></li><li class="chapter-item expanded "><a href="handlers/cookies.html"><strong aria-hidden="true">3.4.</strong> Cookies</a></li><li class="chapter-item expanded "><a href="handlers/sessions.html"><strong aria-hidden="true">3.5.</strong> Sessions</a></li><li class="chapter-item expanded "><a href="handlers/proxy.html"><strong aria-hidden="true">3.6.</strong> Proxy</a></li><li class="chapter-item expanded "><a href="handlers/static.html"><strong aria-hidden="true">3.7.</strong> Static Files</a></li><li class="chapter-item expanded "><a href="handlers/websockets.html"><strong aria-hidden="true">3.8.</strong> Websockets</a></li></ol></li><li class="chapter-item expanded "><a href="testing.html"><strong aria-hidden="true">4.</strong> Testing trillium applications</a></li><li class="chapter-item expanded "><a href="library_patterns.html"><strong aria-hidden="true">5.</strong> Patterns for library authors</a></li><li class="chapter-item expanded "><a href="contributing.html"><strong aria-hidden="true">6.</strong> Contributing</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -276,11 +276,28 @@ components that are Trillium, but I don't expect that to happen for a
 bit. I hope to keep the core feature set of trillium quite small and
 focus on getting the design right and improving performance as much as
 possible. </p>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="two-core-concepts-handlers-and-conn"><a class="header" href="#two-core-concepts-handlers-and-conn">Two core concepts: Handlers and Conn</a></h1>
-<p>The two most important concepts in trillium are the <code>Conn</code> type and the
-<code>Handler</code> trait. Each <code>Conn</code> represents a single http request/response
-pair.</p>
-<h2 id="handlers"><a class="header" href="#handlers">Handlers</a></h2>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="core-concepts-handlers-conn-and-adapters"><a class="header" href="#core-concepts-handlers-conn-and-adapters">Core concepts: Handlers, Conn, and Adapters</a></h1>
+<p>The most important concepts when building a trillium application are
+the <code>Conn</code> type and the <code>Handler</code> trait. Each <code>Conn</code> represents a
+single http request/response pair, and a <code>Handler</code> is the trait that
+all applications, middleware, and endpoints implement.</p>
+<p>Let's start with an overview of a simple trillium application and then
+dig into each of those concepts a little more.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">fn main() {
+    trillium_smol::run(|conn: trillium::Conn| async move {
+        conn.ok(&quot;hello from trillium!&quot;)
+    });
+}
+</code></pre></pre>
+<p>In this example, <code>trillium_smol::run</code> is the runtime adapter and the
+closure is a Handler that responds &quot;hello from trillium!&quot; to any web
+request it receives. This is a fully functional example that you can
+run with only the following dependencies:</p>
+<pre><code class="language-toml">[dependencies]
+trillium = &quot;0.1&quot;
+trillium_smol = &quot;0.1&quot;
+</code></pre>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="handlers"><a class="header" href="#handlers">Handlers</a></h1>
 <p>The simplest form of a handler is any async function that takes a
 <code>Conn</code> and returns that <code>Conn</code>. This example sets a <code>200 Ok</code> status
 and sets a string body.</p>
@@ -308,59 +325,15 @@ here.</p>
     });
 }
 </code></pre></pre>
-<p>This handler will respond to any request at localhost:8080, regardless of
-path, and it will always send a <code>200 Ok</code> http status with the
-specified body of <code>&quot;hello world&quot;</code>.</p>
-<h2 id="conn"><a class="header" href="#conn">Conn</a></h2>
-<p>Before we explore the concept of a handler further, let's take a quick
-aside for <code>Conn</code>. As mentioned above, <code>Conn</code> represents both the
-request and response, as well as any data your application associates
-with that request-response cycle.</p>
-<blockquote>
-<p>🧑‍🎓 Advanced aside: Although the naming of Conn is directly
-borrowed from Elixir's <a href="https://github.com/elixir-plug/plug"><code>plug</code></a>
-and therefore also <a href="https://www.phoenixframework.org/"><code>Phoenix</code></a>,
-it does in fact also own (in the rust sense) the singular
-<code>TcpStream</code> that represents the connection with the http client, and
-dropping a <code>Conn</code> will also disconnect the client as a result.</p>
-</blockquote>
-<p>The <a href="https://docs.trillium.rs/trillium/struct.conn">rustdocs for Conn</a>
-contain the full details for all of the things you can do with a conn.</p>
-<h3 id="returning-conn"><a class="header" href="#returning-conn">Returning Conn</a></h3>
-<p>In general, because you'll be returning <code>Conn</code> from handlers, it
-supports a chainable (fluent) interface for setting properties, like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>conn.with_status(202)
-    .with_header((&quot;content-type&quot;, &quot;application/something-custom&quot;))
-    .with_body(&quot;this is my custom body&quot;)
-<span class="boring">}
-</span></code></pre></pre>
-<h3 id="accessing-http-request-properties"><a class="header" href="#accessing-http-request-properties">Accessing http request properties</a></h3>
-<p>Conn also contains read-only properties like request headers, request
-path, and request method, each of which have getter associated
-functions.</p>
-<h3 id="default-response"><a class="header" href="#default-response">Default Response</a></h3>
-<p>The default response for a Conn is a 404 with no response body, so it
-is always valid to return the Conn from a handler unmodified (<code>|conn: Conn| async move { conn }</code> is the simplest valid handler).</p>
-<h3 id="state"><a class="header" href="#state">State</a></h3>
-<p>In addition to holding the request properties and accumulating the
-response your application is going to send, a Conn also serves as a
-data structure for any information your application needs to associate
-with that request. This is especially valuable for communicating
-between handlers, and most core handlers are implemented using conn
-state. One important caveat to is that each Conn can only contain
-exactly one of each type, so it is highly recommended that you only
-store types that you define in state.</p>
-<blockquote>
-<p>🌊 Comparison with Tide: Tide has three different types of state:
-Server state, request state, and response state. In Trillium, server
-state is achieved using the
-<a href="https://docs.trillium.rs/trillium/struct.state"><code>trillium::State</code></a>
-handler, which holds any type that is Clone and puts a clone of it
-into the state of each Conn that passes through the handler.</p>
-</blockquote>
+<p>This handler will respond to any request regardless of path, and it
+will always send a <code>200 Ok</code> http status with the specified body of
+<code>&quot;hello world&quot;</code>.</p>
+<h2 id="the-state-handler"><a class="header" href="#the-state-handler">The State Handler</a></h2>
+<p>Trillium offers only one handler in the main <code>trillium</code> crate: The
+State handler, which places a clone of any type you provide into the
+state set of each conn that passes through it. See the
+[https://docs.trillium.rs/trillium/struct.state](rustdocs for State)
+for example usage.</p>
 <h2 id="tuple-handlers"><a class="header" href="#tuple-handlers">Tuple Handlers</a></h2>
 <p>Earlier, we discussed that we can use state to send data between
 handlers and that handlers can always pass along the conn
@@ -386,18 +359,99 @@ run((
 </span></code></pre></pre>
 <p>This snippet adds a http logger to our application, so that if we
 execute our application with <code>RUST_LOG=info cargo run</code> and make a
-request to localhost:8000, we'll see something like <code>GET / 200 390.706µs 9bytes</code> on stdout.</p>
-<h3 id="extending-conn"><a class="header" href="#extending-conn">Extending Conn</a></h3>
-<p>It is a very common pattern in trillium for libraries to extend Conn in
-order to provide additional functionality.  The Conn interface does
-not provide support for sessions, cookies, route params, or many other
-building blocks that other frameworks build into the core
+request to http://localhost:8000, we'll see log output on stdout.</p>
+<blockquote>
+<p>🧑‍🎓❓ Why not vectors or arrays? Rust vectors and arrays are type
+homogeneous, so in order to store the Logger and closure type in the
+above example in an array or vector, we'd need to allocate them to
+the heap and actually store a smart pointer in our homogeneous
+collection. Trillium initially was built around a notion of
+&quot;sequences,&quot; which were a wrapper around <code>Vec&lt;Box&lt;dyn Handler + 'static&gt;&gt;</code>. Because tuples are generic over each of their elements,
+they can contain heterogeneous elements of different sizes, without
+heap allocation or smart pointers.</p>
+</blockquote>
+<h2 id="implementing-handler"><a class="header" href="#implementing-handler">Implementing Handler</a></h2>
+<p>The <a href="https://docs.trillium.rs/trillium/trait.handler">rustdocs for
+Handler</a> contains the
+full details of the Handler interface for library authors. For many
+applications, it will not be necessary to use anything other than an
+async function or closure, but Handler can contain its own state and be
+implemented for any type that you author.</p>
+<h2 id="assorted-implementations-provided-by-the-trillium-crate"><a class="header" href="#assorted-implementations-provided-by-the-trillium-crate">Assorted implementations provided by the trillium crate</a></h2>
+<p>You may see a few other types used in tests and examples.</p>
+<ul>
+<li><code>()</code>: the noop handler, identical to <code>|conn: Conn| async move { conn }</code></li>
+<li><code>&amp;'static str</code> and <code>String</code>: This simple handler responds to all
+conns by halting, setting a 200-ok status, and sending the string
+content as response body. <code>trillium_smol::run(&quot;hello&quot;)</code> is identical
+to <code>trillium_smol::run(|conn: Conn| async move { conn.ok(&quot;hello&quot;) })</code></li>
+<li><code>Option&lt;impl Handler&gt;</code>: This handler will noop if the option variant
+is none. This is useful for conditionally including handlers at
+runtime based on configuration or environment.</li>
+</ul>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="conn"><a class="header" href="#conn">Conn</a></h1>
+<p>Before we explore the concept of a handler further, let's take a look
+at <code>Conn</code>. As mentioned above, <code>Conn</code> represents both the request and
+response, as well as any data your application associates with that
+request-response cycle.</p>
+<blockquote>
+<p>🧑‍🎓 Advanced aside: Although the naming of Conn is directly
+borrowed from Elixir's <a href="https://github.com/elixir-plug/plug"><code>plug</code></a>
+and therefore also <a href="https://www.phoenixframework.org/"><code>Phoenix</code></a>,
+it does in fact also own (in the rust sense) the singular
+<code>TcpStream</code> that represents the connection with the http client, and
+dropping a <code>Conn</code> will also disconnect the client as a result.</p>
+</blockquote>
+<p>The <a href="https://docs.trillium.rs/trillium/struct.conn">rustdocs for Conn</a>
+contain the full details for all of the things you can do with a conn.</p>
+<h2 id="returning-conn"><a class="header" href="#returning-conn">Returning Conn</a></h2>
+<p>In general, because you'll be returning <code>Conn</code> from handlers, it
+supports a chainable (fluent) interface for setting properties, like:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>conn.with_status(202)
+    .with_header((&quot;content-type&quot;, &quot;application/something-custom&quot;))
+    .with_body(&quot;this is my custom body&quot;)
+<span class="boring">}
+</span></code></pre></pre>
+<h2 id="accessing-http-request-properties"><a class="header" href="#accessing-http-request-properties">Accessing http request properties</a></h2>
+<p>Conn also contains read-only properties like request headers, request
+path, and request method, each of which have getter associated
+functions.</p>
+<h2 id="default-response"><a class="header" href="#default-response">Default Response</a></h2>
+<p>The default response for a Conn is a 404 with no response body, so it
+is always valid to return the Conn from a handler unmodified (<code>|conn: Conn| async move { conn }</code> is the simplest valid handler).</p>
+<h2 id="state"><a class="header" href="#state">State</a></h2>
+<p>In addition to holding the request properties and accumulating the
+response your application is going to send, a Conn also serves as a
+data structure for any information your application needs to associate
+with that request. This is especially valuable for communicating
+between handlers, and most core handlers are implemented using conn
+state. One important caveat to is that each Conn can only contain
+exactly one of each type, so it is highly recommended that you only
+store types that you define in state.</p>
+<blockquote>
+<p>🌊 Comparison with Tide: Tide has three different types of state:
+Server state, request state, and response state. In Trillium, server
+state is achieved using the
+<a href="https://docs.trillium.rs/trillium/struct.state"><code>trillium::State</code></a>
+handler, which holds any type that is Clone and puts a clone of it
+into the state of each Conn that passes through the handler.</p>
+</blockquote>
+<h2 id="extending-conn"><a class="header" href="#extending-conn">Extending Conn</a></h2>
+<p>It is a very common pattern in trillium for libraries to extend Conn
+in order to provide additional functionality<sup class="footnote-reference"><a href="#1">1</a></sup>. The Conn interface
+does not provide support for sessions, cookies, route params, or many
+other building blocks that other frameworks build into the core
 types. Instead, to use sessions as an example, <code>trillium_sessions</code>
 provides a <code>SessionConnExt</code> trait which provides associated functions
 for Conn that offer session support. In general, handlers that put
 data into conn state also will provide convenience functions for
-accessing that state, and will export a <code>[Something]ConnExt</code> trait. <sup class="footnote-reference"><a href="#1">1</a></sup></p>
-<p><sup class="footnote-reference"><a href="#1">1</a></sup> 🧑‍🎓 see <a href="library_patterns.html">library_patterns</a> for an example of authoring one of these</p>
+accessing that state, and will export a <code>[Something]ConnExt</code> trait.</p>
+<p><sup class="footnote-reference"><a href="#1">1</a></sup> 🧑‍🎓 see <a href="overview/../library_patterns.html">library_patterns</a> for an example
+of authoring one of these</p>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="runtime-adapters-and-tls"><a class="header" href="#runtime-adapters-and-tls">Runtime Adapters and TLS</a></h1>
 <h2 id="runtime-adapters"><a class="header" href="#runtime-adapters">Runtime Adapters</a></h2>
 <p>Let's talk a little more about that <code>trillium_smol::run</code> line we've
 been writing. Trillium itself is built on <code>futures</code> (<code>futures-lite</code>,
@@ -405,63 +459,53 @@ specifically). In order to run it, it needs an adapter to an async
 runtime. There there are four of these
 currently:</p>
 <ul>
-<li><code>trillium_async_std</code></li>
-<li><code>trillium_smol</code></li>
-<li><code>trillium_tokio</code></li>
-<li><code>trillium_aws_lambda</code></li>
+<li><a href="https://docs.trillium.rs/trillium_smol"><code>trillium_smol</code></a></li>
+<li><a href="https://docs.trillium.rs/trillium_async_std"><code>trillium_async_std</code></a></li>
+<li><a href="https://docs.trillium.rs/trillium_tokio"><code>trillium_tokio</code></a></li>
+<li><a href="https://docs.trillium.rs/trillium_aws_lambda"><code>trillium_aws_lambda</code></a></li>
 </ul>
-<p>Although we've been using the smol server in these docs thus far, you
+<p>Although we've been using the smol adapter in these docs thus far, you
 should use whichever runtime you prefer. If you expect to have a
 dependency on async-std or tokio anyway, you might as well use the
-server for that runtime. If you're new to async rust or don't have an
-opinion, I recommend starting with trillium_smol. It is easy to switch trillium between runtimes at any point.</p>
+adapter for that runtime. If you're new to async rust or don't have an
+opinion, I recommend starting with trillium_smol. It is easy to switch
+trillium between runtimes at any point.</p>
 <p>To run trillium on a different host or port, either provide a <code>HOST</code>
 and/or <code>PORT</code> environment variables, or compile the specific values
-into the server as follows:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
-    trillium_smol::config()
-        .with_port(1337)
-        .with_host(&quot;127.0.0.1&quot;)
-        .run(|conn: trillium::Conn| async move { conn.ok(&quot;hello world&quot;) })
-}
-</code></pre></pre>
-<h3 id="tls--https"><a class="header" href="#tls--https">TLS / HTTPS</a></h3>
+into the application as follows:</p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>{{#include ../../smol/examples/smol-with-config.rs}}
+<span class="boring">}
+</span></code></pre></pre>
+<h2 id="tls--https"><a class="header" href="#tls--https">TLS / HTTPS</a></h2>
 <p>With the exception of aws lambda, which provides its own tls
 termination at the load balancer, each of the above servers can be
 combined with either rustls or native-tls.</p>
-<p>Rustls:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
-use trillium_rustls::RustlsAcceptor;
-
-const KEY: &amp;[u8] = include_bytes!(&quot;./key.pem&quot;);
-const CERT: &amp;[u8] = include_bytes!(&quot;./cert.pem&quot;);
-
-pub fn main() {
-    env_logger::init();
-    trillium_smol::config()
-        .with_acceptor(RustlsAcceptor::from_pkcs8(CERT, KEY))
-        .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
-}
-</code></pre></pre>
-<p>Native tls:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
-use trillium_native_tls::NativeTlsAcceptor;
-
-pub fn main() {
-    env_logger::init();
-    let acceptor = NativeTlsAcceptor::from_pkcs12(include_bytes!(&quot;./identity.p12&quot;), &quot;changeit&quot;);
-    trillium_smol::config()
-        .with_acceptor(acceptor)
-        .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
-}
-</code></pre></pre>
+<h3 id="rustls"><a class="header" href="#rustls">Rustls:</a></h3>
+<p><a href="https://docs.trillium.rs/trillium_rustls/index.html">rustdocs (main)</a></p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>{{#include ../../rustls/examples/rustls.rs}}
+<span class="boring">}
+</span></code></pre></pre>
+<h3 id="native-tls"><a class="header" href="#native-tls">Native tls:</a></h3>
+<p><a href="https://docs.trillium.rs/trillium_native_tls/index.html">rustdocs (main)</a></p>
+<pre><pre class="playground"><code class="language-rust edition2018">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>{{#include ../../native-tls/examples/native-tls.rs}}
+<span class="boring">}
+</span></code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
 <p>In order for trillium to be a usable web framework, we offer a number of
 core utilities. However, it is our hope that alternative
 implementations for at least some of these will exist in order to
 explore the design space and accommodate different design constraints
 and tradeoffs. Because not every application will need this
-functionality, they are each released as distinct libraries from the
+functionality, they are each released as distinct crates from the
 core of trillium.</p>
 <ul>
 <li><a href="./handlers/logger.html">Logger</a></li>
@@ -472,83 +516,10 @@ core of trillium.</p>
 <li><a href="./handlers/static.html">Static File Serving</a></li>
 <li><a href="./handlers/websockets.html">Websockets</a></li>
 <li><a href="./handlers/router.html">Router</a></li>
-</ul>
-<h1 id="this-is-a-temporary-dump-of-a-lot-of-links-that-were-previously-in-the-readme"><a class="header" href="#this-is-a-temporary-dump-of-a-lot-of-links-that-were-previously-in-the-readme">This is a temporary dump of a lot of links that were previously in the readme</a></h1>
-<ul>
-<li>trillium
-<ul>
-<li><a href="https://docs.trillium.rs/trillium/index.html">rustdocs (main)</a></li>
-</ul>
-</li>
-<li>testing
-<ul>
-<li>❗ <a href="https://docs.trillium.rs/trillium_testing/index.html">rustdocs (main)</a></li>
-</ul>
-</li>
-<li>trillium-http
-<blockquote>
-<p>a lower abstraction than trillium itself, but potentially usable directly for some use cases</p>
-</blockquote>
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_http/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/http/examples/http.rs">example</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/http/examples/tokio-http.rs">tokio example</a></li>
-</ul>
-</li>
-<li>file serving
-<ul>
-<li>static
-<ul>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/static/examples/static.rs">example</a></li>
-<li><a href="https://docs.trillium.rs/trillium_static/index.html">rustdocs (main)</a></li>
-</ul>
-</li>
-<li>static-compiled
-<ul>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/static-compiled/examples/static-compiled.rs">example</a> </li>
-<li><a href="https://docs.trillium.rs/trillium_static_compiled/index.html">rustdocs (main)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>templating
-<ul>
-<li>askama
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_askama/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/askama/examples/askama.rs">example</a></li>
-</ul>
-</li>
-<li>tera
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_tera/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/tera/examples/tera.rs">example</a></li>
-</ul>
-</li>
-<li>handlebars
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_handlebars/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/handlebars/examples/handlebars.rs">example</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li>http client
 <ul>
 <li><a href="https://docs.trillium.rs/trillium_client/index.html">rustdocs (main)</a></li>
 <li><a href="https://github.com/trillium-rs/trillium/blob/main/client/examples/client.rs">example</a></li>
-</ul>
-</li>
-<li>websockets
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_websockets/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/websockets/examples/websockets.rs">example</a></li>
-</ul>
-</li>
-<li>cookies
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_cookies/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/cookies/examples/cookies.rs">example</a></li>
 </ul>
 </li>
 <li>reverse proxy
@@ -557,79 +528,22 @@ core of trillium.</p>
 <li><a href="https://github.com/trillium-rs/trillium/blob/main/proxy/examples/proxy.rs">example</a></li>
 </ul>
 </li>
-<li>sessions
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_sessions/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/sessions/examples/sessions.rs">example</a></li>
-</ul>
-</li>
-<li>logger
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_logger/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/logger/examples/logger.rs">example</a></li>
-</ul>
-</li>
-<li>Router
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_router/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/router/examples/router.rs">example</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/router/examples/nested-router.rs">nested-router example</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/router/examples/router-with-macro.rs">router-with-macro example</a></li>
-</ul>
-</li>
-<li>tls
-<ul>
-<li>rustls
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_rustls/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/rustls/examples/rustls.rs">example</a></li>
-</ul>
-</li>
-<li>native-tls
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_native_tls/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/native-tls/examples/native-tls.rs">example</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>runtime support
-<ul>
-<li>smol
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_smol/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/smol/examples/smol.rs">example</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/smol/examples/smol-with-config.rs">example-with-config</a></li>
-</ul>
-</li>
-<li>aws-lambda
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_aws_lambda/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/aws-lambda-server/examples/aws-lambda.rs">example</a></li>
-</ul>
-</li>
-<li>tokio
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_tokio/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/tokio/examples/tokio.rs">example</a></li>
-</ul>
-</li>
-<li>async-std
-<ul>
-<li><a href="https://docs.trillium.rs/trillium_async_std/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/async-std/examples/async-std.rs">example</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li>html-rewriter based on cloudflare's lol-html
 <ul>
 <li><a href="https://docs.trillium.rs/trillium_html_rewriter/index.html">rustdocs (main)</a></li>
 <li><a href="https://github.com/trillium-rs/trillium/blob/main/html-rewriter/examples/html-rewriter.rs">html-rewriter</a> example</li>
 </ul>
 </li>
+<li>trillium-http
+<ul>
+<li><a href="https://docs.trillium.rs/trillium_http/index.html">rustdocs (main)</a></li>
+<li><a href="https://github.com/trillium-rs/trillium/blob/main/http/examples/http.rs">example</a></li>
+<li><a href="https://github.com/trillium-rs/trillium/blob/main/http/examples/tokio-http.rs">tokio example</a></li>
 </ul>
-<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="router"><a class="header" href="#router">Router</a></h2>
+</li>
+</ul>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="router"><a class="header" href="#router">Router</a></h1>
+<p><a href="https://docs.trillium.rs/trillium_router/index.html">rustdocs (main)</a></p>
 <p>The trillium router is based on
 <a href="https://github.com/jbr/routefinder">routefinder</a>. This router
 supports two types of patterns: Untyped params and a single
@@ -661,6 +575,65 @@ pub fn main() {
     );
 }
 </code></pre></pre>
+<h2 id="nesting"><a class="header" href="#nesting">Nesting</a></h2>
+<p>Trillium also supports nesting routers, making it possible to express
+complex sub-applications, vaguely along the lines of a <a href="https://guides.rubyonrails.org/engines.html">rails
+engine</a>. When there are
+additional types of routers, it will be possible for an application
+built with one type of router to be published as a crate and nested
+inside of another router as long as they depend on a compatible
+version of the <code>trillium</code> crate.</p>
+<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, conn_unwrap, Conn, Handler};
+use trillium_logger::Logger;
+use trillium_router::{Router, RouterConnExt};
+
+struct User {
+    id: usize,
+}
+
+mod nested_app {
+    use super::*;
+    async fn load_user(conn: Conn) -&gt; Conn {
+        let id = conn_try!(conn, conn.param(&quot;user_id&quot;).unwrap().parse());
+        let user = User { id }; // imagine we were loading a user from a database here
+        conn.with_state(user)
+    }
+
+    async fn greeting(mut conn: Conn) -&gt; Conn {
+        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
+        conn.ok(format!(&quot;hello user {}&quot;, user.id))
+    }
+
+    async fn post(mut conn: Conn) -&gt; Conn {
+        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
+        let body = conn_try!(conn, conn.request_body_string().await);
+        conn.ok(format!(&quot;hello user {}, {}&quot;, user.id, body))
+    }
+
+    async fn some_other_route(conn: Conn) -&gt; Conn {
+        conn.ok(&quot;this is an uninspired example&quot;)
+    }
+
+    pub fn handler() -&gt; impl Handler {
+        (
+            load_user,
+            Router::new()
+                .get(&quot;/greeting&quot;, greeting)
+                .get(&quot;/some/other/route&quot;, some_other_route)
+                .post(&quot;/post&quot;, post),
+        )
+    }
+}
+pub fn main() {
+    env_logger::init();
+    trillium_smol::run((
+        Logger::new(),
+        Router::new()
+            .get(&quot;/&quot;, |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) })
+            .any(&quot;/users/:user_id/*&quot;, nested_app::handler()),
+    ));
+}
+</code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="template-engines"><a class="header" href="#template-engines">Template engines</a></h2>
 <p>There are currently three template engines for trillium. Although they are in no way mutually exclusive, most applications will want at most one of these.</p>
 <h3 id="askama"><a class="header" href="#askama">Askama</a></h3>
@@ -684,6 +657,7 @@ fn main() {
     trillium_smol::run(|conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) });
 }
 </code></pre></pre>
+<p><a href="https://docs.trillium.rs/trillium_askama/index.html">rustdocs (main)</a></p>
 <h3 id="tera"><a class="header" href="#tera">Tera</a></h3>
 <p>Tera offers runtime templating. Trillium's tera integration provides an interface very similar to <code>phoenix</code> or <code>rails</code>, with the notion of <code>assigns</code> being set on the conn prior to render.</p>
 <p>Given the following file in the same directory as main.rs (examples in this case),</p>
@@ -698,6 +672,7 @@ fn main() {
     }));
 }
 </code></pre></pre>
+<p><a href="https://docs.trillium.rs/trillium_tera/index.html">rustdocs (main)</a></p>
 <h3 id="handlebars"><a class="header" href="#handlebars">Handlebars</a></h3>
 <p>Handlebars also offers runtime templating. Given the following file in <code>examples/templates/hello.hbs</code>,</p>
 <pre><code class="language-handlebars">hello {{name}}!
@@ -716,11 +691,15 @@ fn main() {
     ));
 }
 </code></pre></pre>
+<p><a href="https://docs.trillium.rs/trillium_handlebars/index.html">rustdocs (main)</a></p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
-<p>Currently there's just a DevLogger, but soon there will be more
-loggers. Trillium loggers use the <code>log</code> crate and emit one line at the
-info log level per http request/response pair. We like to use the
-<code>env_logger</code> crate, but any <code>log</code> backend will work equally well.</p>
+<p><a href="https://docs.trillium.rs/trillium_logger/">rustdocs (main)</a></p>
+<p>Currently the logger is incredibly simple. The Trillium logger uses
+the <code>log</code> crate and emit one line at the info log level per http
+request/response pair. The trillium docs use the <code>env_logger</code> crate,
+but any <code>log</code> backend will work equally well. Trillium crates will
+never emit at an <code>info</code> level other than in a logger crate other than
+when starting up or shutting down.</p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium_logger::Logger;
 
 pub fn main() {
@@ -729,6 +708,7 @@ pub fn main() {
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
+<p><a href="https://docs.trillium.rs/trillium_cookies/index.html">rustdocs (main)</a></p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
 use trillium_cookies::{cookie::Cookie, CookiesConnExt, CookiesHandler};
 
@@ -750,6 +730,7 @@ pub fn main() {
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="sessions"><a class="header" href="#sessions">Sessions</a></h2>
+<p><a href="https://docs.trillium.rs/trillium_sessions/index.html">rustdocs (main)</a></p>
 <p>Sessions are a common convention in web frameworks, allowing for a
 safe and secure way to associate server-side data with a given http
 client (browser). Trillium's session storage is built on the
@@ -813,6 +794,7 @@ pub fn main() {
 <p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
 <h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
 <p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
+<p><a href="https://docs.trillium.rs/trillium_static/index.html">rustdocs (main)</a></p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::{crate_relative_path, StaticFileHandler};
 
 pub fn main() {
@@ -824,6 +806,7 @@ pub fn main() {
 </code></pre></pre>
 <h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
 <p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
+<p><a href="https://docs.trillium.rs/trillium_static_compiled/index.html">rustdocs (main)</a></p>
 <pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
 pub fn main() {
     trillium_smol::run(
@@ -832,11 +815,7 @@ pub fn main() {
 }
 </code></pre></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
-<p>WebSockets work a lot like tide's, since I recently wrote that
-interface as well. One difference in trillium is that the websocket
-connection also contains some aspects of the original http request,
-such as request headers, the request path and method, and any state
-that has been accumulated by previous handlers in a sequence.</p>
+<p><a href="https://docs.trillium.rs/trillium_websockets/index.html">rustdocs (main)</a></p>
 <pre><pre class="playground"><code class="language-rust edition2018">use futures_util::StreamExt;
 use trillium_websockets::{Message, WebSocket};
 
@@ -852,6 +831,14 @@ pub fn main() {
     }));
 }
 </code></pre></pre>
+<blockquote>
+<p>🌊 WebSockets work a lot like tide's, since I recently wrote that
+interface as well. One difference in trillium is that the websocket
+connection also contains some aspects of the original http request,
+such as request headers, the request path and method, and any state
+that has been accumulated by previous handlers in a sequence.</p>
+</blockquote>
+<div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="testing-trillium-applications"><a class="header" href="#testing-trillium-applications">Testing trillium applications</a></h1>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="patterns-for-library-authors"><a class="header" href="#patterns-for-library-authors">Patterns for library authors</a></h1>
 <h2 id="state-1"><a class="header" href="#state-1">State</a></h2>
 <p>Let's take a look at an implementation of a library that incrementally counts the number of conns that pass through it and attaches the number to each conn. It would be unsafe to store a u64 directly in the state set, because other libraries might be doing so, so we wrap it with a private newtype called ConnNumber. Since this isn't accessible outside of our library, we can be sure that our handler is the only place that sets it.  We provide a ConnExt trait in order to provide access to this data.</p>
