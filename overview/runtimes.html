@@ -184,6 +184,8 @@ dependency on async-std or tokio anyway, you might as well use the
 adapter for that runtime. If you're new to async rust or don't have an
 opinion, I recommend starting with trillium_smol. It is easy to switch
 trillium between runtimes at any point.</p>
+<h1 id="12-factor-by-default-but-overridable"><a class="header" href="#12-factor-by-default-but-overridable">12-Factor by default, but overridable</a></h1>
+<p>Trillium seeks to abide by a <a href="https://12factor.net/config">12 factor</a> approach to configuration, accepting configuration from the environment wherever possible. The number of configuration points that can be customized through environment variables will likely increase over time.</p>
 <p>To run trillium on a different host or port, either provide a <code>HOST</code>
 and/or <code>PORT</code> environment variables, or compile the specific values
 into the application as follows:</p>
@@ -194,6 +196,9 @@ into the application as follows:</p>
         .run(|conn: trillium::Conn| async move { conn.ok(&quot;hello world&quot;) })
 }
 </code></pre>
+<p>In addition to accepting the <code>HOST</code> and <code>PORT</code> configuration from the environment, on cfg(unix) systems, trillium will also pick up a <code>LISTEN_FD</code> environment variable for use with <a href="https://crates.io/crates/catflap">catflap</a>/<a href="https://github.com/mitsuhiko/systemfd">systemfd</a></p>
+<p>For more documentation on the default values and what configuration can be chained onto config(), see <a href="https://docs.trillium.rs/trillium_server_common/struct.config">trillium_server_common::Config</a>.</p>
+<h3 id=""><a class="header" href="#"></a></h3>
 <h2 id="tls--https"><a class="header" href="#tls--https">TLS / HTTPS</a></h2>
 <p>With the exception of aws lambda, which provides its own tls
 termination at the load balancer, each of the above servers can be
