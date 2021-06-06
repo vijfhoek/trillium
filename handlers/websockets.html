@@ -167,7 +167,7 @@
                     <main>
                         <h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
 <p><a href="https://docs.trillium.rs/trillium_websockets/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use futures_util::StreamExt;
+<pre><code class="language-rust noplaypen">use futures_util::StreamExt;
 use trillium_websockets::{Message, WebSocket};
 
 pub fn main() {
@@ -181,7 +181,7 @@ pub fn main() {
         }
     }));
 }
-</code></pre></pre>
+</code></pre>
 <blockquote>
 <p>🌊 WebSockets work a lot like tide's, since I recently wrote that
 interface as well. One difference in trillium is that the websocket

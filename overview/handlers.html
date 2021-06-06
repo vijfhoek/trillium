@@ -169,30 +169,26 @@
 <p>The simplest form of a handler is any async function that takes a
 <code>Conn</code> and returns that <code>Conn</code>. This example sets a <code>200 Ok</code> status
 and sets a string body.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 async fn hello_world(conn: Conn) -&gt; Conn {
     conn.ok(&quot;hello world!&quot;)
 }
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <p>With no further modification, we can drop this handler into a trillium
 server and it will respond to http requests for us. We're using the
 <a href="https://github.com/smol-rs/smol"><code>smol</code></a>-runtime based server adapter
 here.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
+<pre><code class="language-rust noplaypen">pub fn main() {
     trillium_smol::run(hello_world);
 }
-</code></pre></pre>
+</code></pre>
 <p>We can also define this as a closure:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
+<pre><code class="language-rust noplaypen">pub fn main() {
     trillium_smol::run(|conn: trillium::Conn| async move {
         conn.ok(&quot;hello world&quot;)
     });
 }
-</code></pre></pre>
+</code></pre>
 <p>This handler will respond to any request regardless of path, and it
 will always send a <code>200 Ok</code> http status with the specified body of
 <code>&quot;hello world&quot;</code>.</p>
@@ -214,17 +210,13 @@ conn is halted.</p>
 identical to pipelines, and that the term halt <a href="https://hexdocs.pm/plug/Plug.Conn.html#halt/1">is <del>stolen from</del>
 inspired by plug</a></p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>env_logger::init();
+<pre><code class="language-rust noplaypen">env_logger::init();
 use trillium_logger::Logger;
 run((
     Logger::new(),
     |conn: Conn| async move { conn.ok(&quot;tuple!&quot;) }
 ));
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <p>This snippet adds a http logger to our application, so that if we
 execute our application with <code>RUST_LOG=info cargo run</code> and make a
 request to http://localhost:8000, we'll see log output on stdout.</p>

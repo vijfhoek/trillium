@@ -173,13 +173,13 @@ request/response pair. The trillium docs use the <code>env_logger</code> crate,
 but any <code>log</code> backend will work equally well. Trillium crates will
 never emit at an <code>info</code> level other than in a logger crate other than
 when starting up or shutting down.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_logger::Logger;
+<pre><code class="language-rust noplaypen">use trillium_logger::Logger;
 
 pub fn main() {
     env_logger::init();
     trillium_smol::run((Logger::new(), &quot;ok&quot;));
 }
-</code></pre></pre>
+</code></pre>
 
                     </main>
 

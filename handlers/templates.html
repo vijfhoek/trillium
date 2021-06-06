@@ -175,7 +175,7 @@ default. Here's how it looks:</p>
 <p>Given the following file in <code>(cargo root)/templates/examples/hello.html</code>,</p>
 <pre><code class="language-django">Hello, {{ name }}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_askama::{AskamaConnExt, Template};
 
 #[derive(Template)]
@@ -187,14 +187,14 @@ struct HelloTemplate&lt;'a&gt; {
 fn main() {
     trillium_smol::run(|conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) });
 }
-</code></pre></pre>
+</code></pre>
 <p><a href="https://docs.trillium.rs/trillium_askama/index.html">rustdocs (main)</a></p>
 <h3 id="tera"><a class="header" href="#tera">Tera</a></h3>
 <p>Tera offers runtime templating. Trillium's tera integration provides an interface very similar to <code>phoenix</code> or <code>rails</code>, with the notion of <code>assigns</code> being set on the conn prior to render.</p>
 <p>Given the following file in the same directory as main.rs (examples in this case),</p>
 <pre><code class="language-django">Hello, {{ name }}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_tera::{TeraConnExt, TeraHandler};
 
 fn main() {
@@ -202,13 +202,13 @@ fn main() {
         conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;)
     }));
 }
-</code></pre></pre>
+</code></pre>
 <p><a href="https://docs.trillium.rs/trillium_tera/index.html">rustdocs (main)</a></p>
 <h3 id="handlebars"><a class="header" href="#handlebars">Handlebars</a></h3>
 <p>Handlebars also offers runtime templating. Given the following file in <code>examples/templates/hello.hbs</code>,</p>
 <pre><code class="language-handlebars">hello {{name}}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_handlebars::{HandlebarsConnExt, HandlebarsHandler};
 
 fn main() {
@@ -221,7 +221,7 @@ fn main() {
         },
     ));
 }
-</code></pre></pre>
+</code></pre>
 <p><a href="https://docs.trillium.rs/trillium_handlebars/index.html">rustdocs (main)</a></p>
 
                     </main>

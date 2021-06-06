@@ -169,7 +169,7 @@
 <p>Trillium includes a custom http client implementation in order to
 support reverse proxying requests. There are two tls implementations
 for this client.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_logger::Logger;
+<pre><code class="language-rust noplaypen">use trillium_logger::Logger;
 use trillium_rustls::RustlsConnector;
 use trillium_smol::TcpConnector;
 
@@ -179,7 +179,7 @@ pub fn main() {
     env_logger::init();
     trillium_smol::run((Logger::new(), Proxy::new(&quot;https://httpbin.org/&quot;)));
 }
-</code></pre></pre>
+</code></pre>
 
                     </main>
 

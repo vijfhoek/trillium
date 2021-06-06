@@ -171,7 +171,7 @@
 applications.</p>
 <p><a href="https://docs.trillium.rs/trillium_testing">rustdocs (main)</a></p>
 <p>Given a totally-contrived application like this:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, Conn, Handler};
+<pre><code class="language-rust noplaypen">use trillium::{conn_try, Conn, Handler};
 use trillium_logger::Logger;
 
 async fn teapot(mut conn: Conn) -&gt; Conn {
@@ -192,12 +192,9 @@ fn application() -&gt; impl Handler {
 fn main() {
     trillium_smol::run(application());
 }
-</code></pre></pre>
+</code></pre>
 <p>Here's what some simple tests would look like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[cfg(test)]
+<pre><code class="language-rust noplaypen">#[cfg(test)]
 mod tests {
     use super::{application, teapot};
     use trillium_testing::prelude::*;
@@ -233,8 +230,7 @@ mod tests {
         );
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 
                     </main>
 

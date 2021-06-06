@@ -182,7 +182,7 @@ opportunity for innovation and exploration.</p>
 like http://localhost:8000/greet/earth with &quot;hello earth&quot; and
 http://localhost:8000/greet/mars with &quot;hello mars&quot; and responds to
 http://localhost:8000 with &quot;hello everyone&quot;</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_router::{Router, RouterConnExt};
 
 pub fn main() {
@@ -197,7 +197,7 @@ pub fn main() {
             }),
     );
 }
-</code></pre></pre>
+</code></pre>
 <h2 id="nesting"><a class="header" href="#nesting">Nesting</a></h2>
 <p>Trillium also supports nesting routers, making it possible to express
 complex sub-applications, vaguely along the lines of a <a href="https://guides.rubyonrails.org/engines.html">rails
@@ -206,7 +206,7 @@ additional types of routers, it will be possible for an application
 built with one type of router to be published as a crate and nested
 inside of another router as long as they depend on a compatible
 version of the <code>trillium</code> crate.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, conn_unwrap, Conn, Handler};
+<pre><code class="language-rust noplaypen">use trillium::{conn_try, conn_unwrap, Conn, Handler};
 use trillium_logger::Logger;
 use trillium_router::{Router, RouterConnExt};
 
@@ -256,7 +256,7 @@ pub fn main() {
             .any(&quot;/users/:user_id/*&quot;, nested_app::handler()),
     ));
 }
-</code></pre></pre>
+</code></pre>
 
                     </main>
 

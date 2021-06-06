@@ -170,7 +170,7 @@
 <h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
 <p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
 <p><a href="https://docs.trillium.rs/trillium_static/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::{crate_relative_path, StaticFileHandler};
+<pre><code class="language-rust noplaypen">use trillium_static::{crate_relative_path, StaticFileHandler};
 
 pub fn main() {
     trillium_smol::run(
@@ -178,17 +178,17 @@ pub fn main() {
             .with_index_file(&quot;index.html&quot;),
     )
 }
-</code></pre></pre>
+</code></pre>
 <h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
 <p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
 <p><a href="https://docs.trillium.rs/trillium_static_compiled/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
+<pre><code class="language-rust noplaypen">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
 pub fn main() {
     trillium_smol::run(
         StaticCompiledHandler::new(include_dir!(&quot;./examples/files&quot;)).with_index_file(&quot;lib.rs&quot;),
     );
 }
-</code></pre></pre>
+</code></pre>
 
                     </main>
 

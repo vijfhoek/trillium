@@ -170,12 +170,12 @@
 building async rust web applications.</p>
 <p>Trillium runs on stable rust, is fully async, and can run on tokio,
 async-std, or smol. Using Trillium starts with code as simple as this:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">fn main() {
+<pre><code class="language-rust noplaypen">fn main() {
     trillium_smol::run(|conn: trillium::Conn| async move {
         conn.ok(&quot;hello from trillium!&quot;)
     });
 }
-</code></pre></pre>
+</code></pre>
 <p>However, Trillium is also built to scale up to complex applications
 with a full middleware stack comparable to Rails or
 Phoenix. Currently, opt-in features include a router, cookies,

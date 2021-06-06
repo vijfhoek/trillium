@@ -193,7 +193,7 @@ interaction is also present in other frameworks, and is due to the
 fact that regardless of which session store is used, sessions use a
 secure cookie as a unique identifier.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_cookies::CookiesHandler;
 use trillium_sessions::{MemoryStore, SessionConnExt, SessionHandler};
 
@@ -210,7 +210,7 @@ pub fn main() {
         },
     ));
 }
-</code></pre></pre>
+</code></pre>
 
                     </main>
 

@@ -183,14 +183,10 @@ contain the full details for all of the things you can do with a conn.</p>
 <h2 id="returning-conn"><a class="header" href="#returning-conn">Returning Conn</a></h2>
 <p>In general, because you'll be returning <code>Conn</code> from handlers, it
 supports a chainable (fluent) interface for setting properties, like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>conn.with_status(202)
+<pre><code class="language-rust noplaypen">conn.with_status(202)
     .with_header((&quot;content-type&quot;, &quot;application/something-custom&quot;))
     .with_body(&quot;this is my custom body&quot;)
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <h2 id="accessing-http-request-properties"><a class="header" href="#accessing-http-request-properties">Accessing http request properties</a></h2>
 <p>Conn also contains read-only properties like request headers, request
 path, and request method, each of which have getter associated

@@ -172,12 +172,12 @@
 building async rust web applications.</p>
 <p>Trillium runs on stable rust, is fully async, and can run on tokio,
 async-std, or smol. Using Trillium starts with code as simple as this:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">fn main() {
+<pre><code class="language-rust noplaypen">fn main() {
     trillium_smol::run(|conn: trillium::Conn| async move {
         conn.ok(&quot;hello from trillium!&quot;)
     });
 }
-</code></pre></pre>
+</code></pre>
 <p>However, Trillium is also built to scale up to complex applications
 with a full middleware stack comparable to Rails or
 Phoenix. Currently, opt-in features include a router, cookies,
@@ -301,12 +301,12 @@ single http request/response pair, and a <code>Handler</code> is the trait that
 all applications, middleware, and endpoints implement.</p>
 <p>Let's start with an overview of a simple trillium application and then
 dig into each of those concepts a little more.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">fn main() {
+<pre><code class="language-rust noplaypen">fn main() {
     trillium_smol::run(|conn: trillium::Conn| async move {
         conn.ok(&quot;hello from trillium!&quot;)
     });
 }
-</code></pre></pre>
+</code></pre>
 <p>In this example, <code>trillium_smol::run</code> is the runtime adapter and the
 closure is a Handler that responds &quot;hello from trillium!&quot; to any web
 request it receives. This is a fully functional example that you can
@@ -319,30 +319,26 @@ trillium_smol = &quot;0.1&quot;
 <p>The simplest form of a handler is any async function that takes a
 <code>Conn</code> and returns that <code>Conn</code>. This example sets a <code>200 Ok</code> status
 and sets a string body.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 async fn hello_world(conn: Conn) -&gt; Conn {
     conn.ok(&quot;hello world!&quot;)
 }
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <p>With no further modification, we can drop this handler into a trillium
 server and it will respond to http requests for us. We're using the
 <a href="https://github.com/smol-rs/smol"><code>smol</code></a>-runtime based server adapter
 here.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
+<pre><code class="language-rust noplaypen">pub fn main() {
     trillium_smol::run(hello_world);
 }
-</code></pre></pre>
+</code></pre>
 <p>We can also define this as a closure:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
+<pre><code class="language-rust noplaypen">pub fn main() {
     trillium_smol::run(|conn: trillium::Conn| async move {
         conn.ok(&quot;hello world&quot;)
     });
 }
-</code></pre></pre>
+</code></pre>
 <p>This handler will respond to any request regardless of path, and it
 will always send a <code>200 Ok</code> http status with the specified body of
 <code>&quot;hello world&quot;</code>.</p>
@@ -364,17 +360,13 @@ conn is halted.</p>
 identical to pipelines, and that the term halt <a href="https://hexdocs.pm/plug/Plug.Conn.html#halt/1">is <del>stolen from</del>
 inspired by plug</a></p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>env_logger::init();
+<pre><code class="language-rust noplaypen">env_logger::init();
 use trillium_logger::Logger;
 run((
     Logger::new(),
     |conn: Conn| async move { conn.ok(&quot;tuple!&quot;) }
 ));
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <p>This snippet adds a http logger to our application, so that if we
 execute our application with <code>RUST_LOG=info cargo run</code> and make a
 request to http://localhost:8000, we'll see log output on stdout.</p>
@@ -425,14 +417,10 @@ contain the full details for all of the things you can do with a conn.</p>
 <h2 id="returning-conn"><a class="header" href="#returning-conn">Returning Conn</a></h2>
 <p>In general, because you'll be returning <code>Conn</code> from handlers, it
 supports a chainable (fluent) interface for setting properties, like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>conn.with_status(202)
+<pre><code class="language-rust noplaypen">conn.with_status(202)
     .with_header((&quot;content-type&quot;, &quot;application/something-custom&quot;))
     .with_body(&quot;this is my custom body&quot;)
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <h2 id="accessing-http-request-properties"><a class="header" href="#accessing-http-request-properties">Accessing http request properties</a></h2>
 <p>Conn also contains read-only properties like request headers, request
 path, and request method, each of which have getter associated
@@ -491,20 +479,20 @@ trillium between runtimes at any point.</p>
 <p>To run trillium on a different host or port, either provide a <code>HOST</code>
 and/or <code>PORT</code> environment variables, or compile the specific values
 into the application as follows:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">pub fn main() {
+<pre><code class="language-rust noplaypen">pub fn main() {
     trillium_smol::config()
         .with_port(1337)
         .with_host(&quot;127.0.0.1&quot;)
         .run(|conn: trillium::Conn| async move { conn.ok(&quot;hello world&quot;) })
 }
-</code></pre></pre>
+</code></pre>
 <h2 id="tls--https"><a class="header" href="#tls--https">TLS / HTTPS</a></h2>
 <p>With the exception of aws lambda, which provides its own tls
 termination at the load balancer, each of the above servers can be
 combined with either rustls or native-tls.</p>
 <h3 id="rustls"><a class="header" href="#rustls">Rustls:</a></h3>
 <p><a href="https://docs.trillium.rs/trillium_rustls/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_rustls::RustlsAcceptor;
 
 const KEY: &amp;[u8] = include_bytes!(&quot;./key.pem&quot;);
@@ -516,10 +504,10 @@ pub fn main() {
         .with_acceptor(RustlsAcceptor::from_pkcs8(CERT, KEY))
         .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
 }
-</code></pre></pre>
+</code></pre>
 <h3 id="native-tls"><a class="header" href="#native-tls">Native tls:</a></h3>
 <p><a href="https://docs.trillium.rs/trillium_native_tls/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_native_tls::NativeTlsAcceptor;
 
 pub fn main() {
@@ -529,7 +517,7 @@ pub fn main() {
         .with_acceptor(acceptor)
         .run(|conn: Conn| async move { conn.ok(&quot;ok&quot;) });
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="a-tour-of-some-of-the-handlers-that-exist-today"><a class="header" href="#a-tour-of-some-of-the-handlers-that-exist-today">A tour of some of the handlers that exist today</a></h1>
 <p>In order for trillium to be a usable web framework, we offer a number
 of core utilities. However, it is my hope that alternative
@@ -590,7 +578,7 @@ opportunity for innovation and exploration.</p>
 like http://localhost:8000/greet/earth with &quot;hello earth&quot; and
 http://localhost:8000/greet/mars with &quot;hello mars&quot; and responds to
 http://localhost:8000 with &quot;hello everyone&quot;</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_router::{Router, RouterConnExt};
 
 pub fn main() {
@@ -605,7 +593,7 @@ pub fn main() {
             }),
     );
 }
-</code></pre></pre>
+</code></pre>
 <h2 id="nesting"><a class="header" href="#nesting">Nesting</a></h2>
 <p>Trillium also supports nesting routers, making it possible to express
 complex sub-applications, vaguely along the lines of a <a href="https://guides.rubyonrails.org/engines.html">rails
@@ -614,7 +602,7 @@ additional types of routers, it will be possible for an application
 built with one type of router to be published as a crate and nested
 inside of another router as long as they depend on a compatible
 version of the <code>trillium</code> crate.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, conn_unwrap, Conn, Handler};
+<pre><code class="language-rust noplaypen">use trillium::{conn_try, conn_unwrap, Conn, Handler};
 use trillium_logger::Logger;
 use trillium_router::{Router, RouterConnExt};
 
@@ -664,7 +652,7 @@ pub fn main() {
             .any(&quot;/users/:user_id/*&quot;, nested_app::handler()),
     ));
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="template-engines"><a class="header" href="#template-engines">Template engines</a></h2>
 <p>There are currently three template engines for trillium. Although they are in no way mutually exclusive, most applications will want at most one of these.</p>
 <h3 id="askama"><a class="header" href="#askama">Askama</a></h3>
@@ -675,7 +663,7 @@ default. Here's how it looks:</p>
 <p>Given the following file in <code>(cargo root)/templates/examples/hello.html</code>,</p>
 <pre><code class="language-django">Hello, {{ name }}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_askama::{AskamaConnExt, Template};
 
 #[derive(Template)]
@@ -687,14 +675,14 @@ struct HelloTemplate&lt;'a&gt; {
 fn main() {
     trillium_smol::run(|conn: Conn| async move { conn.render(HelloTemplate { name: &quot;world&quot; }) });
 }
-</code></pre></pre>
+</code></pre>
 <p><a href="https://docs.trillium.rs/trillium_askama/index.html">rustdocs (main)</a></p>
 <h3 id="tera"><a class="header" href="#tera">Tera</a></h3>
 <p>Tera offers runtime templating. Trillium's tera integration provides an interface very similar to <code>phoenix</code> or <code>rails</code>, with the notion of <code>assigns</code> being set on the conn prior to render.</p>
 <p>Given the following file in the same directory as main.rs (examples in this case),</p>
 <pre><code class="language-django">Hello, {{ name }}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_tera::{TeraConnExt, TeraHandler};
 
 fn main() {
@@ -702,13 +690,13 @@ fn main() {
         conn.assign(&quot;name&quot;, &quot;hi&quot;).render(&quot;examples/hello.html&quot;)
     }));
 }
-</code></pre></pre>
+</code></pre>
 <p><a href="https://docs.trillium.rs/trillium_tera/index.html">rustdocs (main)</a></p>
 <h3 id="handlebars"><a class="header" href="#handlebars">Handlebars</a></h3>
 <p>Handlebars also offers runtime templating. Given the following file in <code>examples/templates/hello.hbs</code>,</p>
 <pre><code class="language-handlebars">hello {{name}}!
 </code></pre>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_handlebars::{HandlebarsConnExt, HandlebarsHandler};
 
 fn main() {
@@ -721,7 +709,7 @@ fn main() {
         },
     ));
 }
-</code></pre></pre>
+</code></pre>
 <p><a href="https://docs.trillium.rs/trillium_handlebars/index.html">rustdocs (main)</a></p>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
 <p><a href="https://docs.trillium.rs/trillium_logger/">rustdocs (main)</a></p>
@@ -731,16 +719,16 @@ request/response pair. The trillium docs use the <code>env_logger</code> crate,
 but any <code>log</code> backend will work equally well. Trillium crates will
 never emit at an <code>info</code> level other than in a logger crate other than
 when starting up or shutting down.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_logger::Logger;
+<pre><code class="language-rust noplaypen">use trillium_logger::Logger;
 
 pub fn main() {
     env_logger::init();
     trillium_smol::run((Logger::new(), &quot;ok&quot;));
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="cookies"><a class="header" href="#cookies">Cookies</a></h2>
 <p><a href="https://docs.trillium.rs/trillium_cookies/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_cookies::{cookie::Cookie, CookiesConnExt, CookiesHandler};
 
 pub fn main() {
@@ -759,7 +747,7 @@ pub fn main() {
         .ok(&quot;ok!&quot;)
     }));
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="sessions"><a class="header" href="#sessions">Sessions</a></h2>
 <p><a href="https://docs.trillium.rs/trillium_sessions/index.html">rustdocs (main)</a></p>
 <p>Sessions are a common convention in web frameworks, allowing for a
@@ -788,7 +776,7 @@ interaction is also present in other frameworks, and is due to the
 fact that regardless of which session store is used, sessions use a
 secure cookie as a unique identifier.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::Conn;
+<pre><code class="language-rust noplaypen">use trillium::Conn;
 use trillium_cookies::CookiesHandler;
 use trillium_sessions::{MemoryStore, SessionConnExt, SessionHandler};
 
@@ -805,12 +793,12 @@ pub fn main() {
         },
     ));
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="proxy"><a class="header" href="#proxy">Proxy</a></h1>
 <p>Trillium includes a custom http client implementation in order to
 support reverse proxying requests. There are two tls implementations
 for this client.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_logger::Logger;
+<pre><code class="language-rust noplaypen">use trillium_logger::Logger;
 use trillium_rustls::RustlsConnector;
 use trillium_smol::TcpConnector;
 
@@ -820,13 +808,13 @@ pub fn main() {
     env_logger::init();
     trillium_smol::run((Logger::new(), Proxy::new(&quot;https://httpbin.org/&quot;)));
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="static-file-serving"><a class="header" href="#static-file-serving">Static file serving</a></h2>
 <p>Trillium offers two rudimentary approaches to static file serving for now. Neither of these approaches perform any cache-related header checking yet.</p>
 <h3 id="from-disk"><a class="header" href="#from-disk">From disk</a></h3>
 <p>This handler loads content from disk at request, and does not yet do any in-memory caching.</p>
 <p><a href="https://docs.trillium.rs/trillium_static/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static::{crate_relative_path, StaticFileHandler};
+<pre><code class="language-rust noplaypen">use trillium_static::{crate_relative_path, StaticFileHandler};
 
 pub fn main() {
     trillium_smol::run(
@@ -834,20 +822,20 @@ pub fn main() {
             .with_index_file(&quot;index.html&quot;),
     )
 }
-</code></pre></pre>
+</code></pre>
 <h3 id="from-memory-at-compile-time"><a class="header" href="#from-memory-at-compile-time">From memory, at compile time</a></h3>
 <p>This handler includes all of the static content in the compiled binary, allowing it to be shipped independently from the assets.</p>
 <p><a href="https://docs.trillium.rs/trillium_static_compiled/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
+<pre><code class="language-rust noplaypen">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
 pub fn main() {
     trillium_smol::run(
         StaticCompiledHandler::new(include_dir!(&quot;./examples/files&quot;)).with_index_file(&quot;lib.rs&quot;),
     );
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h2 id="websocket-support"><a class="header" href="#websocket-support">WebSocket support</a></h2>
 <p><a href="https://docs.trillium.rs/trillium_websockets/index.html">rustdocs (main)</a></p>
-<pre><pre class="playground"><code class="language-rust edition2018">use futures_util::StreamExt;
+<pre><code class="language-rust noplaypen">use futures_util::StreamExt;
 use trillium_websockets::{Message, WebSocket};
 
 pub fn main() {
@@ -861,7 +849,7 @@ pub fn main() {
         }
     }));
 }
-</code></pre></pre>
+</code></pre>
 <blockquote>
 <p>🌊 WebSockets work a lot like tide's, since I recently wrote that
 interface as well. One difference in trillium is that the websocket
@@ -875,7 +863,7 @@ that has been accumulated by previous handlers in a sequence.</p>
 applications.</p>
 <p><a href="https://docs.trillium.rs/trillium_testing">rustdocs (main)</a></p>
 <p>Given a totally-contrived application like this:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use trillium::{conn_try, Conn, Handler};
+<pre><code class="language-rust noplaypen">use trillium::{conn_try, Conn, Handler};
 use trillium_logger::Logger;
 
 async fn teapot(mut conn: Conn) -&gt; Conn {
@@ -896,12 +884,9 @@ fn application() -&gt; impl Handler {
 fn main() {
     trillium_smol::run(application());
 }
-</code></pre></pre>
+</code></pre>
 <p>Here's what some simple tests would look like:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[cfg(test)]
+<pre><code class="language-rust noplaypen">#[cfg(test)]
 mod tests {
     use super::{application, teapot};
     use trillium_testing::prelude::*;
@@ -937,15 +922,11 @@ mod tests {
         );
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="patterns-for-library-authors"><a class="header" href="#patterns-for-library-authors">Patterns for library authors</a></h1>
 <h2 id="state-1"><a class="header" href="#state-1">State</a></h2>
 <p>Let's take a look at an implementation of a library that incrementally counts the number of conns that pass through it and attaches the number to each conn. It would be unsafe to store a u64 directly in the state set, because other libraries might be doing so, so we wrap it with a private newtype called ConnNumber. Since this isn't accessible outside of our library, we can be sure that our handler is the only place that sets it.  We provide a ConnExt trait in order to provide access to this data.</p>
-<pre><pre class="playground"><code class="language-rust edition2018">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>mod conn_counter {
+<pre><code class="language-rust noplaypen">mod conn_counter {
     use std::sync::{
         atomic::{AtomicU64, Ordering},
         Arc,
@@ -983,10 +964,9 @@ mod tests {
         }
     }
 }
-<span class="boring">}
-</span></code></pre></pre>
+</code></pre>
 <p>And usage of the library looks like this:</p>
-<pre><pre class="playground"><code class="language-rust edition2018">use conn_counter::{ConnCounterConnExt, ConnCounterHandler};
+<pre><code class="language-rust noplaypen">use conn_counter::{ConnCounterConnExt, ConnCounterHandler};
 use trillium::{Conn, Handler};
 
 fn handler() -&gt; impl Handler {
@@ -1013,7 +993,7 @@ mod test {
         assert_ok!(get(&quot;/&quot;).on(&amp;handler), &quot;conn number was 3&quot;);
     }
 }
-</code></pre></pre>
+</code></pre>
 <div id="chapter_begin" style="break-before: page; page-break-before: always;"></div><h1 id="contributing"><a class="header" href="#contributing">Contributing</a></h1>
 <p>If you're excited about the ideas here, this page will be kept up to date with ways to get involved.</p>
 <ol>
