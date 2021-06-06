@@ -204,6 +204,7 @@ mod tests {
 
     #[test]
     fn handler_sends_correct_headers_and_is_a_teapot() {
+        let application = application();
         assert_response!(
             post(&quot;/&quot;).with_request_body(&quot;hello trillium!&quot;).on(&amp;application),
             StatusCode::ImATeapot,
@@ -224,6 +225,7 @@ mod tests {
 
     #[test]
     fn application_is_lemongrab_when_body_is_empty() {
+        let application = application();
         assert_response!(
             post(&quot;/&quot;).on(&amp;application),
             StatusCode::NotAcceptable,
