@@ -157,11 +157,28 @@ request/response pair. The trillium docs use the <code>env_logger</code> crate,
 but any <code>log</code> backend will work equally well. Trillium crates will
 never emit at an <code>info</code> level other than in a logger crate other than
 when starting up or shutting down.</p>
-<pre><code class="language-rust noplaypen">use trillium_logger::Logger;
+<pre><code class="language-rust noplaypen">use trillium::{Conn, State};
+use trillium_logger::{apache_combined, Logger, Target};
+
+#[derive(Clone, Copy)]
+struct User(&amp;'static str);
+
+impl User {
+    pub fn name(&amp;self) -&gt; &amp;'static str {
+        &amp;self.0
+    }
+}
 
 pub fn main() {
-    env_logger::init();
-    trillium_smol::run((Logger::new(), &quot;ok&quot;));
+    trillium_smol::run((
+        State::new(User(&quot;jacob&quot;)),
+        Logger::new()
+            .with_formatter(apache_combined(&quot;-&quot;, |conn: &amp;Conn, _color| {
+                conn.state::&lt;User&gt;().map(User::name).unwrap_or(&quot;-&quot;)
+            }))
+            .with_target(Target::Stdout),
+        &quot;ok&quot;,
+    ));
 }
 </code></pre>
 
