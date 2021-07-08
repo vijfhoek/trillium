@@ -237,7 +237,7 @@ pub fn main() {
         Logger::new(),
         Router::new()
             .get(&quot;/&quot;, |conn: Conn| async move { conn.ok(&quot;hello everyone&quot;) })
-            .any(&quot;/users/:user_id/*&quot;, nested_app::handler()),
+            .any(&amp;[&quot;get&quot;, &quot;post&quot;], &quot;/users/:user_id/*&quot;, nested_app::handler()),
     ));
 }
 </code></pre>
