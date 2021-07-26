@@ -158,6 +158,7 @@
 
 pub fn main() {
     env_logger::init();
+    #[cfg(unix)]
     trillium_smol::run(
         StaticFileHandler::new(crate_relative_path!(&quot;examples/files&quot;))
             .with_index_file(&quot;index.html&quot;),
@@ -169,6 +170,7 @@ pub fn main() {
 <p><a href="https://docs.trillium.rs/trillium_static_compiled/index.html">rustdocs (main)</a></p>
 <pre><code class="language-rust noplaypen">use trillium_static_compiled::{include_dir, StaticCompiledHandler};
 pub fn main() {
+    #[cfg(unix)]
     trillium_smol::run(
         StaticCompiledHandler::new(include_dir!(&quot;./examples/files&quot;)).with_index_file(&quot;lib.rs&quot;),
     );

@@ -180,7 +180,7 @@ into the application as follows:</p>
         .run(|conn: trillium::Conn| async move { conn.ok(&quot;hello world&quot;) })
 }
 </code></pre>
-<p>In addition to accepting the <code>HOST</code> and <code>PORT</code> configuration from the environment, on cfg(unix) systems, trillium will also pick up a <code>LISTEN_FD</code> environment variable for use with <a href="https://crates.io/crates/catflap">catflap</a>/<a href="https://github.com/mitsuhiko/systemfd">systemfd</a></p>
+<p>In addition to accepting the <code>HOST</code> and <code>PORT</code> configuration from the environment, on cfg(unix) systems, trillium will also pick up a <code>LISTEN_FD</code> environment variable for use with <a href="https://crates.io/crates/catflap">catflap</a>/<a href="https://github.com/mitsuhiko/systemfd">systemfd</a>. On <code>cfg(unix)</code> systems, if the <code>HOST</code> begins with <code>.</code>, <code>/</code>, or <code>~</code>, it is interpreted as a path and bound as a unix domain socket.</p>
 <p>For more documentation on the default values and what configuration can be chained onto config(), see <a href="https://docs.trillium.rs/trillium_server_common/struct.config">trillium_server_common::Config</a>.</p>
 <h3 id=""><a class="header" href="#"></a></h3>
 <h2 id="tls--https"><a class="header" href="#tls--https">TLS / HTTPS</a></h2>
