@@ -155,17 +155,17 @@
 applications.</p>
 <p><a href="https://docs.trillium.rs/trillium_testing">rustdocs (main)</a></p>
 <p>Given a totally-contrived application like this:</p>
-<pre><code class="language-rust noplaypen">use trillium::{conn_try, Conn, Handler};
+<pre><code class="language-rust noplaypen">use trillium::{conn_try, Conn, Handler, KnownHeaderName};
 use trillium_logger::Logger;
 
 async fn teapot(mut conn: Conn) -&gt; Conn {
-    let request_body = conn_try!(conn, conn.request_body_string().await);
+    let request_body = conn_try!(conn.request_body_string().await, conn);
     if request_body.is_empty() {
         conn.with_status(406).with_body(&quot;unacceptable!&quot;).halt()
     } else {
         conn.with_body(format!(&quot;request body was: {}&quot;, request_body))
             .with_status(418)
-            .with_header((&quot;server&quot;, &quot;zojirushi&quot;))
+            .with_header(KnownHeaderName::Server, &quot;zojirushi&quot;)
     }
 }
 
@@ -188,7 +188,7 @@ mod tests {
         let application = application();
         assert_response!(
             post(&quot;/&quot;).with_request_body(&quot;hello trillium!&quot;).on(&amp;application),
-            StatusCode::ImATeapot,
+            Status::ImATeapot,
             &quot;request body was: hello trillium!&quot;,
             &quot;server&quot; =&gt; &quot;zojirushi&quot;,
             &quot;content-length&quot; =&gt; &quot;33&quot;
@@ -209,7 +209,7 @@ mod tests {
         let application = application();
         assert_response!(
             post(&quot;/&quot;).on(&amp;application),
-            StatusCode::NotAcceptable,
+            Status::NotAcceptable,
             &quot;unacceptable!&quot;
         );
     }

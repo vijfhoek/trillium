@@ -201,19 +201,19 @@ struct User {
 mod nested_app {
     use super::*;
     async fn load_user(conn: Conn) -&gt; Conn {
-        let id = conn_try!(conn, conn.param(&quot;user_id&quot;).unwrap().parse());
+        let id = conn_try!(conn.param(&quot;user_id&quot;).unwrap().parse(), conn);
         let user = User { id }; // imagine we were loading a user from a database here
         conn.with_state(user)
     }
 
     async fn greeting(mut conn: Conn) -&gt; Conn {
-        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
+        let user = conn_unwrap!(conn.take_state::&lt;User&gt;(), conn);
         conn.ok(format!(&quot;hello user {}&quot;, user.id))
     }
 
     async fn post(mut conn: Conn) -&gt; Conn {
-        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
-        let body = conn_try!(conn, conn.request_body_string().await);
+        let user = conn_unwrap!(conn.take_state::&lt;User&gt;(), conn);
+        let body = conn_try!(conn.request_body_string().await, conn);
         conn.ok(format!(&quot;hello user {}, {}&quot;, user.id, body))
     }
 

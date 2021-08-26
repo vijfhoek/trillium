@@ -263,12 +263,8 @@ don't need to compile or run a router.</p>
 <p>Everything is opt-in, instead of opt-out. Trillium uses small crates,
 each of which declares its own dependencies.</p>
 <h3 id="relation-to-tide-http-types-and-async-h1"><a class="header" href="#relation-to-tide-http-types-and-async-h1">Relation to tide, http-types, and async-h1</a></h3>
-<p>Currently, trillium uses http-types for several core types, like headers,
-status codes, response bodies, and the conn state type map. Trillium
-sessions also shares the same session store backends as
-tide. Currently, trillium reuses several types from async-h1, but does not
-depend on the crate in order to avoid pulling in unnecessary
-dependencies.</p>
+<p>As of trillium-v0.2.0, trillium no longer depends on http-types.</p>
+<p>Trillium shares the same session store backends as tide.</p>
 <h3 id="relation-to-elixir-plug-and-phoenix"><a class="header" href="#relation-to-elixir-plug-and-phoenix">Relation to Elixir Plug and Phoenix</a></h3>
 <p>The general architecture is directly inspired by Plug, and is intended
 to be a hybrid of the best of plug and the best of tide. Eventually, I
@@ -606,19 +602,19 @@ struct User {
 mod nested_app {
     use super::*;
     async fn load_user(conn: Conn) -&gt; Conn {
-        let id = conn_try!(conn, conn.param(&quot;user_id&quot;).unwrap().parse());
+        let id = conn_try!(conn.param(&quot;user_id&quot;).unwrap().parse(), conn);
         let user = User { id }; // imagine we were loading a user from a database here
         conn.with_state(user)
     }
 
     async fn greeting(mut conn: Conn) -&gt; Conn {
-        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
+        let user = conn_unwrap!(conn.take_state::&lt;User&gt;(), conn);
         conn.ok(format!(&quot;hello user {}&quot;, user.id))
     }
 
     async fn post(mut conn: Conn) -&gt; Conn {
-        let user = conn_unwrap!(conn, conn.take_state::&lt;User&gt;());
-        let body = conn_try!(conn, conn.request_body_string().await);
+        let user = conn_unwrap!(conn.take_state::&lt;User&gt;(), conn);
+        let body = conn_try!(conn.request_body_string().await, conn);
         conn.ok(format!(&quot;hello user {}, {}&quot;, user.id, body))
     }
 
@@ -878,17 +874,17 @@ that has been accumulated by previous handlers in a sequence.</p>
 applications.</p>
 <p><a href="https://docs.trillium.rs/trillium_testing">rustdocs (main)</a></p>
 <p>Given a totally-contrived application like this:</p>
-<pre><code class="language-rust noplaypen">use trillium::{conn_try, Conn, Handler};
+<pre><code class="language-rust noplaypen">use trillium::{conn_try, Conn, Handler, KnownHeaderName};
 use trillium_logger::Logger;
 
 async fn teapot(mut conn: Conn) -&gt; Conn {
-    let request_body = conn_try!(conn, conn.request_body_string().await);
+    let request_body = conn_try!(conn.request_body_string().await, conn);
     if request_body.is_empty() {
         conn.with_status(406).with_body(&quot;unacceptable!&quot;).halt()
     } else {
         conn.with_body(format!(&quot;request body was: {}&quot;, request_body))
             .with_status(418)
-            .with_header((&quot;server&quot;, &quot;zojirushi&quot;))
+            .with_header(KnownHeaderName::Server, &quot;zojirushi&quot;)
     }
 }
 
@@ -911,7 +907,7 @@ mod tests {
         let application = application();
         assert_response!(
             post(&quot;/&quot;).with_request_body(&quot;hello trillium!&quot;).on(&amp;application),
-            StatusCode::ImATeapot,
+            Status::ImATeapot,
             &quot;request body was: hello trillium!&quot;,
             &quot;server&quot; =&gt; &quot;zojirushi&quot;,
             &quot;content-length&quot; =&gt; &quot;33&quot;
@@ -932,7 +928,7 @@ mod tests {
         let application = application();
         assert_response!(
             post(&quot;/&quot;).on(&amp;application),
-            StatusCode::NotAcceptable,
+            Status::NotAcceptable,
             &quot;unacceptable!&quot;
         );
     }

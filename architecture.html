@@ -181,12 +181,8 @@ don't need to compile or run a router.</p>
 <p>Everything is opt-in, instead of opt-out. Trillium uses small crates,
 each of which declares its own dependencies.</p>
 <h3 id="relation-to-tide-http-types-and-async-h1"><a class="header" href="#relation-to-tide-http-types-and-async-h1">Relation to tide, http-types, and async-h1</a></h3>
-<p>Currently, trillium uses http-types for several core types, like headers,
-status codes, response bodies, and the conn state type map. Trillium
-sessions also shares the same session store backends as
-tide. Currently, trillium reuses several types from async-h1, but does not
-depend on the crate in order to avoid pulling in unnecessary
-dependencies.</p>
+<p>As of trillium-v0.2.0, trillium no longer depends on http-types.</p>
+<p>Trillium shares the same session store backends as tide.</p>
 <h3 id="relation-to-elixir-plug-and-phoenix"><a class="header" href="#relation-to-elixir-plug-and-phoenix">Relation to Elixir Plug and Phoenix</a></h3>
 <p>The general architecture is directly inspired by Plug, and is intended
 to be a hybrid of the best of plug and the best of tide. Eventually, I
