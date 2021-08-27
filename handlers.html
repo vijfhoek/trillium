@@ -174,21 +174,33 @@ of trillium.</p>
 </li>
 <li>reverse proxy
 <ul>
+<li>use trillium as a reverse proxy for another server</li>
 <li><a href="https://docs.trillium.rs/trillium_proxy/index.html">rustdocs (main)</a></li>
 <li><a href="https://github.com/trillium-rs/trillium/blob/main/proxy/examples/proxy.rs">example</a></li>
 </ul>
 </li>
-<li>html-rewriter based on cloudflare's lol-html
+<li>method override
 <ul>
-<li><a href="https://docs.trillium.rs/trillium_html_rewriter/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/html-rewriter/examples/html-rewriter.rs">html-rewriter</a> example</li>
+<li>the trillium-method-override crate adds support for using post
+requests with a query param as a substitute for other http methods</li>
+<li><a href="https://docs.trillium.rs/trillium_method_override/index.html">rustdocs (main)</a></li>
+<li><a href="https://github.com/trillium-rs/trillium/blob/main/method-override/examples/method-override.rs">example</a></li>
 </ul>
 </li>
-<li>trillium-http
+<li>head
 <ul>
-<li><a href="https://docs.trillium.rs/trillium_http/index.html">rustdocs (main)</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/http/examples/http.rs">example</a></li>
-<li><a href="https://github.com/trillium-rs/trillium/blob/main/http/examples/tokio-http.rs">tokio example</a></li>
+<li>the trillium-head crate supports responding to head requests</li>
+<li><a href="https://docs.trillium.rs/trillium_head/index.html">rustdocs (main)</a></li>
+<li><a href="https://github.com/trillium-rs/trillium/blob/main/head/examples/head.rs">example</a></li>
+</ul>
+</li>
+<li>forwarding
+<ul>
+<li>the trillium-forwarding crate supports setting remote ip and
+protocol from forwarded/x-forwarded-* headers sent by trusted
+reverse proxies</li>
+<li><a href="https://docs.trillium.rs/trillium_forwarding/index.html">rustdocs (main)</a></li>
+<li><a href="https://github.com/trillium-rs/trillium/blob/main/forwarding/examples/forwarding.rs">example</a></li>
 </ul>
 </li>
 </ul>
