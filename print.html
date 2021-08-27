@@ -714,12 +714,6 @@ fn main() {
 <p><a href="https://docs.trillium.rs/trillium_handlebars/index.html">rustdocs (main)</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="logger"><a class="header" href="#logger">Logger</a></h2>
 <p><a href="https://docs.trillium.rs/trillium_logger/">rustdocs (main)</a></p>
-<p>Currently the logger is incredibly simple. The Trillium logger uses
-the <code>log</code> crate and emit one line at the info log level per http
-request/response pair. The trillium docs use the <code>env_logger</code> crate,
-but any <code>log</code> backend will work equally well. Trillium crates will
-never emit at an <code>info</code> level other than in a logger crate other than
-when starting up or shutting down.</p>
 <pre><code class="language-rust noplaypen">use trillium::{Conn, State};
 use trillium_logger::{apache_combined, Logger, Target};
 
